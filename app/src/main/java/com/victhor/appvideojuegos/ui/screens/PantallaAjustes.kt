@@ -21,5 +21,6 @@ fun PantallaAjustes(
 
 @Composable
 fun ContenidoPantallaAjustes(navController: NavController, viewModel: VideojuegoViewModel) {
+    // TODO: añadir opciones de tema oscuro y borrar biblioteca
     Text("Ajustes")
 }
