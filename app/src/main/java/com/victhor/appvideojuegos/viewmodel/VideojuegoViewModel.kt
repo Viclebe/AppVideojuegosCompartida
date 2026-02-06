@@ -29,6 +29,36 @@ class VideojuegoViewModel(application: Application) : AndroidViewModel(applicati
         useCase.eliminarVideojuego(videojuego)
     }
 
+    fun buscar(texto: String): LiveData<List<Videojuego>> {
+        return if (texto.isBlank()) {
+            listaVideojuegos
+        } else
+            useCase.buscarVideojuegos(texto)
+    }
+
     fun buscarVideojuegoPorId(id: Int): LiveData<Videojuego> =
         useCase.buscarVideojuegoPorId(id)
+
+    fun filtrarPorGenero(genero: String): LiveData<List<Videojuego>> =
+        useCase.obtenerListaVideojuegosPorGenero(genero)
+
+    fun filtrarPorPlataforma(plataforma: String): LiveData<List<Videojuego>> =
+        useCase.obtenerListaVideojuegosPorPlataforma(plataforma)
+
+    fun filtrarPorEstado(estado: String): LiveData<List<Videojuego>> =
+        useCase.obtenerListaVideojuegosPorEstado(estado)
+
+
+    //Estadísticas
+    val totalVideojuegos = useCase.totalVideojuegos()
+    val jugando = useCase.totalVideojuegosJugando()
+    val pendientes = useCase.totalVideojuegosPendiente()
+    val finalizados = useCase.totalVideojuegosFinalizado()
+    val mediaValoracion = useCase.mediaValoracion()
+    val horasTotales = useCase.totalHoras()
+
+    //Eliminar todo
+    fun borrarBiblioteca() {
+        useCase.eliminarBiblioteca()
+    }
 }

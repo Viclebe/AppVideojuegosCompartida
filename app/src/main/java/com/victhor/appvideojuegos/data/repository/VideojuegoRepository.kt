@@ -65,7 +65,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
     }
 
     fun buscarVideojuegoPorId(id: Int): LiveData<Videojuego> {
-        return dao.buscarVideojuegoPorId(id).map {
+        return dao.obtenerVideojuegoPorId(id).map {
             Videojuego(
                 id = it.id,
                 titulo = it.titulo,
@@ -78,5 +78,77 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
         }
     }
 
+    fun filtrarVideojuegoPorGenero(genero: String): LiveData<List<Videojuego>> {
+        return dao.obtenerVideojuegoPorGenero(genero).map { entidades ->
+            entidades.map {
+                Videojuego(
+                    id = it.id,
+                    titulo = it.titulo,
+                    genero = it.genero,
+                    plataforma = it.plataforma,
+                    estado = it.estado,
+                    horasJugadas = it.horasJugadas,
+                    valoracion = it.valoracion
+                )
+            }
+        }
+    }
 
+    fun filtrarVideojuegoPorPlataforma(plataforma: String): LiveData<List<Videojuego>> {
+        return dao.obtenerVideojuegoPorPlataforma(plataforma).map { entidades ->
+            entidades.map {
+                Videojuego(
+                    id = it.id,
+                    titulo = it.titulo,
+                    genero = it.genero,
+                    plataforma = it.plataforma,
+                    estado = it.estado,
+                    horasJugadas = it.horasJugadas,
+                    valoracion = it.valoracion
+                )
+            }
+        }
+    }
+
+    fun filtrarVideojuegoPorEstado(estado: String): LiveData<List<Videojuego>> {
+        return dao.obtenerVideojuegoPorEstado(estado).map { entidades ->
+            entidades.map {
+                Videojuego(
+                    id = it.id,
+                    titulo = it.titulo,
+                    genero = it.genero,
+                    plataforma = it.plataforma,
+                    estado = it.estado,
+                    horasJugadas = it.horasJugadas,
+                    valoracion = it.valoracion
+                )
+            }
+        }
+    }
+
+    fun buscarVideojuego(texto: String): LiveData<List<Videojuego>> {
+        return dao.buscarVideojuegos(texto).map { entidades ->
+            entidades.map {
+                Videojuego(
+                    id = it.id,
+                    titulo = it.titulo,
+                    genero = it.genero,
+                    plataforma = it.plataforma,
+                    estado = it.estado,
+                    horasJugadas = it.horasJugadas,
+                    valoracion = it.valoracion
+                )
+            }
+
+        }
+    }
+
+    //Estadísticas
+    fun contarVideojuegos(): LiveData<Int> = dao.obtenerSumaVideojuegos()
+    fun contarPorEstado(estado: String): LiveData<Int> = dao.obtenerSumaPorEstado(estado)
+    fun mediaValoracion(): LiveData<Double> = dao.obtenerMediaValoracion()
+    fun contarHorasJugadas(): LiveData<Int> = dao.obtenerHorasTotales()
+
+    //Eliminar todo
+    fun eliminarTodo() = dao.eliminarTodaBiblioteca()
 }

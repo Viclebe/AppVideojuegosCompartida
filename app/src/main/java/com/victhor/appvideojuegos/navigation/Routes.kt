@@ -8,15 +8,14 @@ sealed class Routes(val route: String) {
     object Insertar : Routes("insertar")
 
     object Modificar : Routes("modificar") {
-        fun rutaModificar(id: Int) = "modificar/$id"
+        //fun rutaModificar(id: Int) = "modificar/$id"
     }
 
     object Detalle : Routes("detalle") {
-        fun rutaDetalle(id: Int) = "detalle/$id"
+        //fun rutaDetalle(id: Int) = "detalle/$id"
     }
 
     object Estadisticas : Routes("estadisticas")
-    object Filtros : Routes("filtros")
+    object Buscar : Routes("filtros")
     object Ajustes : Routes("ajustes")
-    object Buscar : Routes("buscar")
 }

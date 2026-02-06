@@ -51,7 +51,7 @@ fun ContenidoPantallaPrincipal(navController: NavController, viewModel: Videojue
             LazyColumn {
                 items(listaVideojuegos) { videojuego ->
                     Text(
-                        text = "${videojuego.titulo},${videojuego.estado},${videojuego.valoracion}",
+                        text = "${videojuego.titulo} / ${videojuego.estado} / ${videojuego.valoracion}",
                         modifier = Modifier
                             .padding(16.dp)
                             .clickable {
@@ -67,5 +67,25 @@ fun ContenidoPantallaPrincipal(navController: NavController, viewModel: Videojue
         }) {
             Text(text = "+")
         }
+
+        Button(onClick = {
+            navController.navigate(Routes.Buscar.route)
+
+        }) {
+            Text(text = "Buscar")
+        }
+        Button(onClick = {
+            navController.navigate(Routes.Estadisticas.route)
+
+        }) {
+            Text(text = "Perfil")
+        }
+        Button(onClick = {
+            navController.navigate(Routes.Ajustes.route)
+
+        }) {
+            Text(text = "Ajustes")
+        }
+
     }
 }

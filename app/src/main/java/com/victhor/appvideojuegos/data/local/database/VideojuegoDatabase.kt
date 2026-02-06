@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.victhor.appvideojuegos.data.local.dao.VideojuegoDAO
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 
@@ -29,3 +30,5 @@ abstract class VideojuegoDatabase : RoomDatabase() {
         }
     }
 }
+
+

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 
+
 @Composable
 fun PantallaModificar(
     navController: NavController,
@@ -47,7 +48,10 @@ fun ContenidoPantallaModificar(
     videojuego?.let { original ->
 
         var titulo by remember { mutableStateOf(original.titulo) }
+        var genero by remember { mutableStateOf(original.genero) }
+        var plataforma by remember { mutableStateOf(original.plataforma) }
         var estado by remember { mutableStateOf(original.estado) }
+        var horasJugadas by remember { mutableStateOf(original.horasJugadas.toString()) }
         var valoracion by remember {
             mutableStateOf(original.valoracion.toString())
         }
@@ -61,9 +65,27 @@ fun ContenidoPantallaModificar(
             )
 
             OutlinedTextField(
+                value = genero,
+                onValueChange = { genero = it },
+                label = { Text("Género") }
+            )
+
+            OutlinedTextField(
+                value = plataforma,
+                onValueChange = { plataforma = it },
+                label = { Text("Plataforma") }
+            )
+
+            OutlinedTextField(
                 value = estado,
                 onValueChange = { estado = it },
                 label = { Text("Estado") }
+            )
+
+            OutlinedTextField(
+                value = horasJugadas,
+                onValueChange = { horasJugadas = it },
+                label = { Text("Horas Jugadas") }
             )
 
             OutlinedTextField(
@@ -78,7 +100,10 @@ fun ContenidoPantallaModificar(
                 viewModel.modificar(
                     original.copy(
                         titulo = titulo,
+                        genero = genero,
+                        plataforma = plataforma,
                         estado = estado,
+                        horasJugadas = horasJugadas.toIntOrNull() ?: original.horasJugadas,
                         valoracion = valoracion.toDoubleOrNull() ?: original.valoracion
                     )
                 )

@@ -35,7 +35,7 @@ fun PantallaDetalle(
             Text("Género: ${it.genero}")
             Text("Plataforma: ${it.plataforma}")
             Text("Estado: ${it.estado}")
-            Text("Horas: ${it.horasJugadas}")
+            Text("Horas jugadas: ${it.horasJugadas}")
             Text("Valoración: ${it.valoracion}")
 
             Spacer(modifier = Modifier.height(16.dp))
