@@ -14,8 +14,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppVideojuegosTheme {
-                val viewModel: VideojuegoViewModel = viewModel()
+            val viewModel: VideojuegoViewModel=viewModel()
+            val modoOscuro = viewModel.modoOscuro
+
+            AppVideojuegosTheme(darkTheme = modoOscuro){
+                //val viewModel: VideojuegoViewModel = viewModel()
                 Navigation(videojuegoViewModel = viewModel)
             }
         }

@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
+import com.victhor.appvideojuegos.navigation.Routes
 
 
 @Composable
@@ -30,7 +32,10 @@ fun PantallaEstadisticas(
 }
 
 @Composable
-fun ContenidoPantallaEstadísticas(navController: NavController, viewModel: VideojuegoViewModel) {
+fun ContenidoPantallaEstadísticas(
+    navController: NavController,
+    viewModel: VideojuegoViewModel
+) {
     val total by viewModel.totalVideojuegos.observeAsState(0)
     val jugando by viewModel.jugando.observeAsState(0)
     val pendientes by viewModel.pendientes.observeAsState(0)
@@ -53,5 +58,12 @@ fun ContenidoPantallaEstadísticas(navController: NavController, viewModel: Vide
         Text("Finalizados: $finalizados")
         Text("Media valoración: ${"%.2f".format(media)}")
         Text("Horas totales jugadas: $horas")
+
+        Button(onClick = {
+            navController.navigate(Routes.Principal.route)
+
+        }) {
+            Text(text = "<-")
+        }
     }
 }

@@ -10,19 +10,6 @@ class VideojuegoUseCase(private val repositorio: VideojuegoRepository) {
         return repositorio.listarVideojuegos
     }
 
-    fun obtenerListaVideojuegosPorGenero(genero: String): LiveData<List<Videojuego>> {
-        return repositorio.filtrarVideojuegoPorGenero(genero)
-    }
-
-    fun obtenerListaVideojuegosPorPlataforma(plataforma: String): LiveData<List<Videojuego>> {
-        return repositorio.filtrarVideojuegoPorPlataforma(plataforma)
-    }
-
-    fun obtenerListaVideojuegosPorEstado(estado: String): LiveData<List<Videojuego>> {
-        return repositorio.filtrarVideojuegoPorEstado(estado)
-    }
-
-
     suspend fun insertarVideojuego(videojuego: Videojuego) {
         repositorio.insertarVideojuego(videojuego)
     }

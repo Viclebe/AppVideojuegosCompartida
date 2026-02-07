@@ -9,6 +9,9 @@ import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import com.victhor.appvideojuegos.domain.usecase.VideojuegoUseCase
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 class VideojuegoViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
@@ -39,16 +42,6 @@ class VideojuegoViewModel(application: Application) : AndroidViewModel(applicati
     fun buscarVideojuegoPorId(id: Int): LiveData<Videojuego> =
         useCase.buscarVideojuegoPorId(id)
 
-    fun filtrarPorGenero(genero: String): LiveData<List<Videojuego>> =
-        useCase.obtenerListaVideojuegosPorGenero(genero)
-
-    fun filtrarPorPlataforma(plataforma: String): LiveData<List<Videojuego>> =
-        useCase.obtenerListaVideojuegosPorPlataforma(plataforma)
-
-    fun filtrarPorEstado(estado: String): LiveData<List<Videojuego>> =
-        useCase.obtenerListaVideojuegosPorEstado(estado)
-
-
     //Estadísticas
     val totalVideojuegos = useCase.totalVideojuegos()
     val jugando = useCase.totalVideojuegosJugando()
@@ -60,5 +53,13 @@ class VideojuegoViewModel(application: Application) : AndroidViewModel(applicati
     //Eliminar todo
     fun borrarBiblioteca() {
         useCase.eliminarBiblioteca()
+    }
+
+    //Modo Oscuro
+    var modoOscuro by mutableStateOf(false)
+        private set
+
+    fun cambiarModoOscuro() {
+        modoOscuro = !modoOscuro
     }
 }

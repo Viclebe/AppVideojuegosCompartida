@@ -26,16 +26,6 @@ interface VideojuegoDAO {
     @Query("SELECT * FROM videojuegos WHERE id = :id")
     fun obtenerVideojuegoPorId(id: Int): LiveData<VideojuegoEntity>
 
-    //Querys para filtrar
-    @Query("SELECT * FROM videojuegos WHERE genero = :genero")
-    fun obtenerVideojuegoPorGenero(genero: String): LiveData<List<VideojuegoEntity>>
-
-    @Query("SELECT * FROM videojuegos WHERE plataforma = :plataforma")
-    fun obtenerVideojuegoPorPlataforma(plataforma: String): LiveData<List<VideojuegoEntity>>
-
-    @Query("SELECT * FROM videojuegos WHERE estado = :estado")
-    fun obtenerVideojuegoPorEstado(estado: String): LiveData<List<VideojuegoEntity>>
-
     //Query para búsqueda
     @Query(
         "SELECT * FROM videojuegos WHERE titulo LIKE '%' || :texto || '%'OR genero LIKE '%' || :texto || '%'OR plataforma LIKE '%' || :texto || '%'OR estado LIKE '%' || :texto || '%'"

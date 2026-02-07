@@ -74,7 +74,7 @@ fun ContenidoPantallaInsertar(
         OutlinedTextField(
             value = estado,
             onValueChange = { estado = it },
-            label = { Text("Estado (Jugando / Terminado)") },
+            label = { Text("Estado (Jugando / Pendiente / Finalizado)") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -118,5 +118,12 @@ fun ContenidoPantallaInsertar(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Guardar")
+    }
+
+    Button(onClick = {
+        navController.navigate(Routes.Principal.route)
+
+    }) {
+        Text(text = "Cancelar")
     }
 }

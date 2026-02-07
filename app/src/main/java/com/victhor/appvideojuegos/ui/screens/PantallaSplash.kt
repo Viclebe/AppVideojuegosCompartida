@@ -22,7 +22,6 @@ import kotlinx.coroutines.delay
 import com.victhor.appvideojuegos.R
 
 
-
 @Composable
 fun PantallaSplash(navController: NavController) {
     //Efecto que se ejecuta una sola vez
@@ -42,16 +41,9 @@ fun PantallaSplash(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_app),
+            painter = painterResource(id = R.drawable.logonombre),
             contentDescription = "logo_app",
-            modifier = Modifier.size(150.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "App Videojuegos",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            modifier = Modifier.size(500.dp)
         )
     }
 }

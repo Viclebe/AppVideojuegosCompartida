@@ -16,7 +16,9 @@ import com.victhor.appvideojuegos.navigation.Routes
 
 
 @Composable
-fun PantallaOnboarding(navController: NavController) {
+fun PantallaOnboarding(
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,18 +30,21 @@ fun PantallaOnboarding(navController: NavController) {
 
         //logo
         Image(
-            painter = painterResource(id = R.drawable.logo_app),
+            painter = painterResource(id = R.drawable.logonombre),
             contentDescription = "logo_app",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(500.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        Text("Convierte cada partida en memoria: juega, guarda, recuerda")
         Button(onClick = {
             navController.navigate(Routes.Principal.route)
         }) {
-            Text("Empezar")
+            Text("Comenzar")
         }
+        Spacer(modifier = Modifier.height(40.dp))
+
     }
 
 }

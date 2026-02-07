@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 
 
 @Composable
@@ -87,6 +88,12 @@ fun ContenidoPantallaBuscar(
                     )
                 }
             }
+        }
+        Button(onClick = {
+            navController.navigate(Routes.Principal.route)
+
+        }) {
+            Text(text = "<-")
         }
     }
 }

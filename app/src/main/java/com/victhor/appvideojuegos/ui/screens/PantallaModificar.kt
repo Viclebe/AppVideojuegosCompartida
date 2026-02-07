@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.victhor.appvideojuegos.navigation.Routes
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 
 
@@ -79,7 +80,7 @@ fun ContenidoPantallaModificar(
             OutlinedTextField(
                 value = estado,
                 onValueChange = { estado = it },
-                label = { Text("Estado") }
+                label = { Text("Estado (Jugando / Pendiente / Finalizado)") }
             )
 
             OutlinedTextField(
@@ -110,6 +111,13 @@ fun ContenidoPantallaModificar(
                 navController.popBackStack()
             }) {
                 Text("Guardar cambios")
+            }
+
+            Button(onClick = {
+                navController.navigate(Routes.Principal.route)
+
+            }) {
+                Text(text = "Cancelar")
             }
         }
     }
