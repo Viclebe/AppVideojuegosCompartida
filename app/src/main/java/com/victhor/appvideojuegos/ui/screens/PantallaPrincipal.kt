@@ -56,6 +56,7 @@ fun ContenidoPantallaPrincipal(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Mostrar listado de videojuegos de la BBDD
         if (listaVideojuegos.isEmpty()) {
             Text("No hay videojuegos todavía")
         } else {
@@ -84,6 +85,7 @@ fun ContenidoPantallaPrincipal(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        //Botones para buscar,añadir, estadísticas y ajustes
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -115,7 +117,7 @@ fun ContenidoPantallaPrincipal(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("➕ Añadir videojuego")
+            Text("Añadir videojuego")
         }
     }
 }
