@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 
+//---Capa para la lógica de negocio (desacopla la UI del repositorio)---
 class VideojuegoUseCase(private val repositorio: VideojuegoRepository) {
 
     fun obtenerListaVideojuegos(): LiveData<List<Videojuego>> {
@@ -29,7 +30,7 @@ class VideojuegoUseCase(private val repositorio: VideojuegoRepository) {
     fun buscarVideojuegoPorId(id: Int): LiveData<Videojuego> =
         repositorio.buscarVideojuegoPorId(id)
 
-    //cÁLCULO   estadísticas
+    //Cálculo de estadísticas
     fun totalVideojuegos(): LiveData<Int> = repositorio.contarVideojuegos()
     fun totalVideojuegosJugando(): LiveData<Int> = repositorio.contarPorEstado("Jugando")
     fun totalVideojuegosPendiente(): LiveData<Int> = repositorio.contarPorEstado("Pendiente")

@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 
+//---DAO obtiene la información directamente de la BBDD mediante consultas---
 @Dao
 interface VideojuegoDAO {
     @Query("SELECT * FROM videojuegos ORDER BY titulo")

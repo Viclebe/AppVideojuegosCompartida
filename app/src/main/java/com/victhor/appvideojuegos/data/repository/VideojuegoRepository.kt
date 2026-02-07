@@ -6,7 +6,11 @@ import com.victhor.appvideojuegos.data.local.dao.VideojuegoDAO
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 import com.victhor.appvideojuegos.domain.model.Videojuego
 
+//---Clase intermediaria entre BBDD y domain/UI
+//Transfiere las entidades
 class VideojuegoRepository(private val dao: VideojuegoDAO) {
+
+    //LiveData para la lista de videojuegos, convierte videojuegoEntity en VIdeojuego
     val listarVideojuegos: LiveData<List<Videojuego>> =
         dao.obtenerTodosVideojuegos().map { entidades ->
             entidades.map {
@@ -22,6 +26,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
             }
         }
 
+    //Insertar en la BBDD
     suspend fun insertarVideojuego(videojuego: Videojuego) {
         dao.insertar(
             VideojuegoEntity(
@@ -36,6 +41,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
         )
     }
 
+    //Modificar
     suspend fun modificarVideojuego(videojuego: Videojuego) {
         dao.modificar(
             VideojuegoEntity(
@@ -50,6 +56,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
         )
     }
 
+    //Eliminar
     suspend fun eliminarVideojuego(videojuego: Videojuego) {
         dao.eliminar(
             VideojuegoEntity(
@@ -64,6 +71,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
         )
     }
 
+    //Buscar videojuego por id (para detalles y modificar)
     fun buscarVideojuegoPorId(id: Int): LiveData<Videojuego> {
         return dao.obtenerVideojuegoPorId(id).map {
             Videojuego(
@@ -78,6 +86,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
         }
     }
 
+    //Buscar videojuego por texto (para buscar)
     fun buscarVideojuego(texto: String): LiveData<List<Videojuego>> {
         return dao.buscarVideojuegos(texto).map { entidades ->
             entidades.map {

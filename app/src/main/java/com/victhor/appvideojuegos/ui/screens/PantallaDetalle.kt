@@ -1,6 +1,5 @@
 package com.victhor.appvideojuegos.ui.screens
 
-import android.R.attr.id
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,6 +45,7 @@ fun ContenidoPantallaDetalle(
     viewModel: VideojuegoViewModel,
     id: Int
 ) {
+    //Observar un videojuego por id y actualizar automáticamente si cambia
     val videojuego by viewModel.buscarVideojuegoPorId(id).observeAsState()
     var mostrarDialogo by remember { mutableStateOf(false) }
 
@@ -69,11 +69,12 @@ fun ContenidoPantallaDetalle(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("🎮 Género: ${vj.genero}")
-                    Text("🖥 Plataforma: ${vj.plataforma}")
-                    Text("📌 Estado: ${vj.estado}")
-                    Text("⏱ Horas jugadas: ${vj.horasJugadas}")
-                    Text("⭐ Valoración: ${vj.valoracion}")
+                    //Card con los datos
+                    Text("Género: ${vj.genero}")
+                    Text("Plataforma: ${vj.plataforma}")
+                    Text("Estado: ${vj.estado}")
+                    Text("Horas jugadas: ${vj.horasJugadas}")
+                    Text("Valoración: ${vj.valoracion}")
                 }
             }
 
@@ -81,6 +82,7 @@ fun ContenidoPantallaDetalle(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                //Ruta a modificar
                 Button(onClick = {
                     navController.navigate(
                         Routes.Modificar.route + "/${vj.id}"
@@ -89,6 +91,7 @@ fun ContenidoPantallaDetalle(
                     Text("Modificar")
                 }
 
+                //Botón para eliminar
                 Button(
                     onClick = { mostrarDialogo = true },
                     colors = ButtonDefaults.buttonColors(
@@ -99,15 +102,16 @@ fun ContenidoPantallaDetalle(
                 }
             }
 
+            //Botón para vovler
             OutlinedButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Volver")
             }
         }
     }
 
+    //Pantalla de alerta al borrar
     if (mostrarDialogo) {
         AlertDialog(
             onDismissRequest = { mostrarDialogo = false },

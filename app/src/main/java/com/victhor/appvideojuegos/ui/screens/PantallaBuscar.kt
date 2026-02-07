@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 
 
 @Composable
@@ -47,6 +48,7 @@ fun ContenidoPantallaBuscar(
 ) {
     var texto by remember { mutableStateOf("") }
 
+    //Observar los resultados
     val videojuegos by viewModel
         .buscar(texto)
         .observeAsState(emptyList())
@@ -57,8 +59,11 @@ fun ContenidoPantallaBuscar(
             .padding(16.dp)
     ) {
 
-        Text("Buscar videojuegos")
-
+        //Campo de búsqueda
+        Text(
+            text = "Buscar videojuegos",
+            style = MaterialTheme.typography.headlineSmall
+        )
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
@@ -81,6 +86,7 @@ fun ContenidoPantallaBuscar(
                             .fillMaxWidth()
                             .padding(12.dp)
                             .clickable {
+                                //Navegar al detalle
                                 navController.navigate(
                                     Routes.Detalle.route + "/${videojuego.id}"
                                 )
@@ -89,11 +95,10 @@ fun ContenidoPantallaBuscar(
                 }
             }
         }
-        Button(onClick = {
-            navController.navigate(Routes.Principal.route)
-
-        }) {
-            Text(text = "<-")
+        Button(
+            onClick = { navController.popBackStack() },
+        ) {
+            Text("Volver")
         }
     }
 }

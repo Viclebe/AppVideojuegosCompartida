@@ -35,6 +35,7 @@ fun Navigation(videojuegoViewModel: VideojuegoViewModel) {
             PantallaInsertar(navController, videojuegoViewModel)
         }
 
+        //Pantalla de modificación con parámetro Id
         composable(
             route = Routes.Modificar.route + "/{id}",
             arguments = listOf(

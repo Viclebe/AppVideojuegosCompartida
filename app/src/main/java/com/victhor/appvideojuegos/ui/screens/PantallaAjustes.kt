@@ -12,8 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
-import com.victhor.appvideojuegos.navigation.Routes
-
 
 @Composable
 fun PantallaAjustes(
@@ -33,8 +31,8 @@ fun ContenidoPantallaAjustes(
     navController: NavController,
     viewModel: VideojuegoViewModel
 ) {
+    //Mostrar/ocultar dialogo de confirmación
     var mostrarDialogo by remember { mutableStateOf(false) }
-
 
     Column(
         modifier = Modifier
@@ -87,10 +85,11 @@ fun ContenidoPantallaAjustes(
         Text("Versión: $version")
         Text("Desarrollador: Víctor León Benedicto")
 
-        Button(onClick = {
-            navController.navigate(Routes.Principal.route)
-        }) {
-            Text(text = "<-")
+        Button(
+            onClick = { navController.popBackStack() },
+            //modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Volver")
         }
     }
 

@@ -3,8 +3,10 @@ package com.victhor.appvideojuegos.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+//---Tabla videojuegos en la BBDD---
 @Entity(tableName = "videojuegos")
 data class VideojuegoEntity(
+    //Clave Pirmaria autogenerada
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val titulo: String,

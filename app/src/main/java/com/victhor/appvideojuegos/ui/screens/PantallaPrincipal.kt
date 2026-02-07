@@ -50,7 +50,7 @@ fun ContenidoPantallaPrincipal(
     ) {
 
         Text(
-            text = "Mi biblioteca 🎮",
+            text = "Mi biblioteca",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -75,7 +75,7 @@ fun ContenidoPantallaPrincipal(
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(videojuego.titulo, fontWeight = FontWeight.Bold)
-                            Text("${videojuego.estado} · ⭐ ${videojuego.valoracion}")
+                            Text("${videojuego.estado} · ${videojuego.valoracion}")
                         }
                     }
                 }
@@ -97,7 +97,7 @@ fun ContenidoPantallaPrincipal(
             Button(onClick = {
                 navController.navigate(Routes.Estadisticas.route)
             }) {
-                Text("Perfil")
+                Text("Estadísticas")
             }
 
             Button(onClick = {

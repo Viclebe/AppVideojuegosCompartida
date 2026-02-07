@@ -7,15 +7,14 @@ import androidx.navigation.NavController
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import com.victhor.appvideojuegos.navigation.Routes
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 
 
 @Composable
@@ -36,6 +35,7 @@ fun ContenidoPantallaEstadísticas(
     navController: NavController,
     viewModel: VideojuegoViewModel
 ) {
+    //Recalcular automáticamente los valores
     val total by viewModel.totalVideojuegos.observeAsState(0)
     val jugando by viewModel.jugando.observeAsState(0)
     val pendientes by viewModel.pendientes.observeAsState(0)
@@ -46,24 +46,39 @@ fun ContenidoPantallaEstadísticas(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Estadísticas")
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Estadísticas",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
-        Text("Total videojuegos: $total")
-        Text("Jugando: $jugando")
-        Text("Pendientes: $pendientes")
-        Text("Finalizados: $finalizados")
-        Text("Media valoración: ${"%.2f".format(media)}")
-        Text("Horas totales jugadas: $horas")
+        //Card con las estadísticas
+        Card {
+            Column(Modifier.padding(16.dp)) {
+                Text("Total videojuegos: $total")
+                Text("Jugando: $jugando")
+                Text("Pendientes: $pendientes")
+                Text("Finalizados: $finalizados")
+            }
+        }
 
-        Button(onClick = {
-            navController.navigate(Routes.Principal.route)
+        //Card con estadísticas
+        Card {
+            Column(Modifier.padding(16.dp)) {
+                Text("Media valoración: ${"%.2f".format(media)}")
+                Text("Horas totales: $horas")
+            }
+        }
 
-        }) {
-            Text(text = "<-")
+        //Botón para volver
+        Button(
+            onClick = { navController.popBackStack() },
+        ) {
+            Text("Volver")
         }
     }
+
 }

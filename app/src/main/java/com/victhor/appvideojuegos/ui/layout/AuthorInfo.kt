@@ -12,20 +12,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.victhor.appvideojuegos.R
 
+
+
 @Composable
 fun AuthorInfo(modifier: Modifier = Modifier) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(100.dp)
             .background(MaterialTheme.colorScheme.primary),
-        contentAlignment = Alignment.Center
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.nombre),
             contentDescription = "Logo app",
             modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .padding(8.dp),
+                .fillMaxWidth(1f)
+                .fillMaxHeight(),
             contentScale = ContentScale.Fit
         )
     }
