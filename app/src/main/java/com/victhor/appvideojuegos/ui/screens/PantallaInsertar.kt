@@ -39,6 +39,7 @@ fun ContenidoPantallaInsertar(
     var estado by remember { mutableStateOf("") }
     var horasJugadas by remember { mutableStateOf("") }
     var valoracion by remember { mutableStateOf("") }
+    //var descripcion by remember { mutableStateOf("") }
 
     var errorHoras by remember { mutableStateOf(false) }
     var errorValoracion by remember { mutableStateOf(false) }
@@ -139,6 +140,13 @@ fun ContenidoPantallaInsertar(
                 style = MaterialTheme.typography.bodySmall
             )
         }
+        /*OutlinedTextField(
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = { Text("Descripción") },
+            modifier = Modifier.fillMaxWidth()
+        )*/
+
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
@@ -152,6 +160,7 @@ fun ContenidoPantallaInsertar(
                             estado = estado,
                             horasJugadas = horasJugadas.toIntOrNull() ?: 0,
                             valoracion = valoracion.toDoubleOrNull() ?: 0.0
+                            /*descripcion = descripcion*/
                         )
 
                         viewModel.insertar(videojuego)

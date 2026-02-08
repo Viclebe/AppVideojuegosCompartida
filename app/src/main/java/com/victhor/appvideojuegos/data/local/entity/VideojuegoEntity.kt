@@ -14,5 +14,5 @@ data class VideojuegoEntity(
     val plataforma: String, //PS5, Xbox, Nintendo Switch, PC
     val estado: String, //Jugando, pendiente, finalizado
     val horasJugadas: Int,
-    val valoracion: Double // de 1 a 5
+    val valoracion: Double
 )

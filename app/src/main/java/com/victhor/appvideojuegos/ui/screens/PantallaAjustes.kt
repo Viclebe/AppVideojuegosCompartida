@@ -6,12 +6,15 @@ import androidx.navigation.NavController
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.Delete
+
 
 @Composable
 fun PantallaAjustes(
@@ -69,15 +72,19 @@ fun ContenidoPantallaAjustes(
                 containerColor = MaterialTheme.colorScheme.error
             )
         ) {
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Eliminar"
+            )
             Text("Borrar toda la biblioteca")
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Información de la app
         Text(
             text = "Información de la App",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
         val version = LocalContext.current.packageManager.getPackageInfo(
             LocalContext.current.packageName, 0
@@ -87,7 +94,6 @@ fun ContenidoPantallaAjustes(
 
         Button(
             onClick = { navController.popBackStack() },
-            //modifier = Modifier.fillMaxWidth()
         ) {
             Text("Volver")
         }

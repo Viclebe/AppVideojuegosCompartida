@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
 
 
 @Composable
@@ -47,7 +48,9 @@ fun ContenidoPantallaEstadísticas(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
 
         Text(
@@ -57,19 +60,28 @@ fun ContenidoPantallaEstadísticas(
 
         //Card con las estadísticas
         Card {
-            Column(Modifier.padding(16.dp)) {
-                Text("Total videojuegos: $total")
-                Text("Jugando: $jugando")
-                Text("Pendientes: $pendientes")
-                Text("Finalizados: $finalizados")
-            }
-        }
+            Column(
+                Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text("Total videojuegos")
+                Text("$total")
 
-        //Card con estadísticas
-        Card {
-            Column(Modifier.padding(16.dp)) {
-                Text("Media valoración: ${"%.2f".format(media)}")
-                Text("Horas totales: $horas")
+                Text("Jugando")
+                Text("$jugando")
+
+                Text("Pendientes")
+                Text("$pendientes")
+
+                Text("Finalizados")
+                Text("$finalizados")
+
+                Text("Media valoración")
+                Text("%.2f".format(media))
+
+                Text("Horas totales")
+                Text("$horas")
             }
         }
 
@@ -80,5 +92,5 @@ fun ContenidoPantallaEstadísticas(
             Text("Volver")
         }
     }
-
 }
+

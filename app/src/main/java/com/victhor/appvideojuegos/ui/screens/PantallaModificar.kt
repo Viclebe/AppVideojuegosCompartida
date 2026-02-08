@@ -60,6 +60,8 @@ fun ContenidoPantallaModificar(
         var valoracion by remember {
             mutableStateOf(original.valoracion.toString())
         }
+        // var descripcion by remember { mutableStateOf(original.descripcion) }
+
 
         //Variables para las validaciones
         var errorHoras by remember { mutableStateOf(false) }
@@ -159,6 +161,13 @@ fun ContenidoPantallaModificar(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
+            /* OutlinedTextField(
+                 value = descripcion,
+                 onValueChange = { descripcion = it },
+                 label = { Text("Descripción") },
+                 modifier = Modifier.fillMaxWidth()
+             )*/
 
             Spacer(modifier = Modifier.height(8.dp))
 

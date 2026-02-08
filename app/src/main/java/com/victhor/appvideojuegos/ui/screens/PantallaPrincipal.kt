@@ -21,6 +21,8 @@ import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 
 
 @Composable
@@ -117,6 +119,10 @@ fun ContenidoPantallaPrincipal(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Añadir"
+            )
             Text("Añadir videojuego")
         }
     }

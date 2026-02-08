@@ -82,6 +82,7 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                 estado = it.estado,
                 horasJugadas = it.horasJugadas,
                 valoracion = it.valoracion
+
             )
         }
     }

@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.*
 
 
 @Composable
@@ -70,11 +74,17 @@ fun ContenidoPantallaDetalle(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     //Card con los datos
-                    Text("Género: ${vj.genero}")
-                    Text("Plataforma: ${vj.plataforma}")
-                    Text("Estado: ${vj.estado}")
-                    Text("Horas jugadas: ${vj.horasJugadas}")
-                    Text("Valoración: ${vj.valoracion}")
+                    InsertarIcono(Icons.Filled.Category, "Género: ${vj.genero}")
+                    InsertarIcono(Icons.Filled.VideogameAsset, "Plataforma: ${vj.plataforma}")
+                    InsertarIcono(Icons.Filled.Flag, "Estado: ${vj.estado}")
+                    InsertarIcono(Icons.Filled.Schedule, "Horas jugadas: ${vj.horasJugadas}")
+                    InsertarIcono(Icons.Filled.Star, "Valoración: ${vj.valoracion}")
+                    /*InsertarIcono(
+                        Icons.Filled.TextRotationAngleup,
+                        "Descripción: ${vj.descripcion}"
+                    )*/
+
+
                 }
             }
 
@@ -137,3 +147,18 @@ fun ContenidoPantallaDetalle(
         )
     }
 }
+
+//Función para añadir iconos sin repetir código
+@Composable
+fun InsertarIcono(
+    icono: ImageVector,
+    texto: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        //iconovacío, añadimos después
+        Icon(icono, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(texto)
+    }
+}
+
