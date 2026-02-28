@@ -16,34 +16,37 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.victhor.appvideojuegos.navigation.Routes
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
-import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import com.victhor.appvideojuegos.viewmodel.PrincipalUiState
+import com.victhor.appvideojuegos.viewmodel.PrincipalViewModel
 
 
 @Composable
 fun PantallaPrincipal(
     navController: NavController,
-    viewModel: VideojuegoViewModel
+    viewModel: PrincipalViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     AppScaffold {
         ContenidoPantallaPrincipal(
-            navController = navController,
-            viewModel = viewModel
+            uiState = uiState,
+            navController = navController
         )
     }
 }
 
 @Composable
 fun ContenidoPantallaPrincipal(
-    navController: NavController,
-    viewModel: VideojuegoViewModel
+    uiState: PrincipalUiState,
+    navController: NavController
 ) {
-    val listaVideojuegos by viewModel.listaVideojuegos.collectAsState()
 
     Column(
         modifier = Modifier
@@ -58,27 +61,51 @@ fun ContenidoPantallaPrincipal(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        //Mostrar listado de videojuegos de la BBDD
-        if (listaVideojuegos.isEmpty()) {
-            Text("No hay videojuegos todavía")
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f)
-            ) {
-                items(listaVideojuegos) { videojuego ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
-                                navController.navigate(
-                                    Routes.Detalle.route + "/${videojuego.id}"
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            uiState.error != null -> {
+                Text(
+                    text = uiState.error,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            uiState.listaVideojuegos.isEmpty() -> {
+                Text("No hay videojuegos todavía")
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(uiState.listaVideojuegos) { videojuego ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
+                                .clickable {
+                                    navController.navigate(
+                                        Routes.Detalle.route + "/${videojuego.id}"
+                                    )
+                                }
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = videojuego.titulo,
+                                    fontWeight = FontWeight.Bold
                                 )
+                                Text("${videojuego.estado} · ${videojuego.valoracion}")
                             }
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text(videojuego.titulo, fontWeight = FontWeight.Bold)
-                            Text("${videojuego.estado} · ${videojuego.valoracion}")
                         }
                     }
                 }
@@ -87,7 +114,6 @@ fun ContenidoPantallaPrincipal(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        //Botones para buscar,añadir, estadísticas y ajustes
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -123,6 +149,7 @@ fun ContenidoPantallaPrincipal(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Añadir"
             )
+            Spacer(modifier = Modifier.width(8.dp))
             Text("Añadir videojuego")
         }
     }

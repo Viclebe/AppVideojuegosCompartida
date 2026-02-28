@@ -6,11 +6,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
 import com.victhor.appvideojuegos.ui.screens.*
+import com.victhor.appvideojuegos.ui.screens.PantallaPrincipal
+import com.victhor.appvideojuegos.viewmodel.AjustesViewModel
+import com.victhor.appvideojuegos.viewmodel.BuscarViewModel
+import com.victhor.appvideojuegos.viewmodel.DetalleViewModel
+import com.victhor.appvideojuegos.viewmodel.EstadisticasViewModel
+import com.victhor.appvideojuegos.viewmodel.InsertarViewModel
+import com.victhor.appvideojuegos.viewmodel.ModificarViewModel
+import com.victhor.appvideojuegos.viewmodel.PrincipalViewModel
 
 @Composable
-fun Navigation(videojuegoViewModel: VideojuegoViewModel) {
+fun Navigation(
+    principalViewModel: PrincipalViewModel,
+    modificarViewModel: ModificarViewModel,
+    insertarViewModel: InsertarViewModel,
+    estadisticasViewModel: EstadisticasViewModel,
+    detalleViewModel: DetalleViewModel,
+    buscarViewModel: BuscarViewModel,
+    ajustesViewModel: AjustesViewModel
+) {
 
     val navController = rememberNavController()
 
@@ -28,11 +43,11 @@ fun Navigation(videojuegoViewModel: VideojuegoViewModel) {
         }
 
         composable(Routes.Principal.route) {
-            PantallaPrincipal(navController, videojuegoViewModel)
+            PantallaPrincipal(navController, principalViewModel)
         }
 
         composable(Routes.Insertar.route) {
-            PantallaInsertar(navController, videojuegoViewModel)
+            PantallaInsertar(navController, insertarViewModel)
         }
 
         //Pantalla de modificación con parámetro Id
@@ -46,7 +61,7 @@ fun Navigation(videojuegoViewModel: VideojuegoViewModel) {
 
             PantallaModificar(
                 navController = navController,
-                viewModel = videojuegoViewModel,
+                viewModel = modificarViewModel,
                 id = id
             )
         }
@@ -60,21 +75,21 @@ fun Navigation(videojuegoViewModel: VideojuegoViewModel) {
             val id = backStackEntry.arguments!!.getInt("id")
             PantallaDetalle(
                 navController = navController,
-                viewModel = videojuegoViewModel,
+                viewModel = detalleViewModel,
                 id = id
             )
         }
 
         composable(Routes.Estadisticas.route) {
-            PantallaEstadisticas(navController, videojuegoViewModel)
+            PantallaEstadisticas(navController, estadisticasViewModel)
         }
 
         composable(Routes.Ajustes.route) {
-            PantallaAjustes(navController, videojuegoViewModel)
+            PantallaAjustes(navController, ajustesViewModel)
         }
 
         composable(Routes.Buscar.route) {
-            PantallaBuscar(navController, videojuegoViewModel)
+            PantallaBuscar(navController, buscarViewModel)
         }
     }
 }

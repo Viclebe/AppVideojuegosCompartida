@@ -1,97 +1,66 @@
 package com.victhor.appvideojuegos.ui.screens
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.navigation.NavController
-import com.victhor.appvideojuegos.ui.layout.AppScaffold
-import com.victhor.appvideojuegos.viewmodel.VideojuegoViewModel
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.victhor.appvideojuegos.ui.layout.AppScaffold
+import com.victhor.appvideojuegos.viewmodel.EstadisticasUiState
+import com.victhor.appvideojuegos.viewmodel.EstadisticasViewModel
 
 @Composable
 fun PantallaEstadisticas(
     navController: NavController,
-    viewModel: VideojuegoViewModel
+    viewModel: EstadisticasViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     AppScaffold {
-        ContenidoPantallaEstadísticas(
-            navController = navController,
-            viewModel = viewModel
-        )
-    }
-}
-
-@Composable
-fun ContenidoPantallaEstadísticas(
-    navController: NavController,
-    viewModel: VideojuegoViewModel
-) {
-    //Recalcular automáticamente los valores
-    val total by viewModel.totalVideojuegos.collectAsState()
-    val jugando by viewModel.jugando.collectAsState()
-    val pendientes by viewModel.pendientes.collectAsState()
-    val finalizados by viewModel.finalizados.collectAsState()
-    val media by viewModel.mediaValoracion.collectAsState()
-    val horas by viewModel.horasTotales.collectAsState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ) {
-
-        Text(
-            text = "Estadísticas",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        //Card con las estadísticas
-        Card {
-            Column(
-                Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Text("Total videojuegos")
-                Text("$total")
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Estadísticas",
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-                Text("Jugando")
-                Text("$jugando")
+                Card {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Total videojuegos: ${uiState.total}")
+                        Text("Jugando: ${uiState.jugando}")
+                        Text("Pendientes: ${uiState.pendientes}")
+                        Text("Finalizados: ${uiState.finalizados}")
+                        Text("Media valoración: %.2f".format(uiState.mediaValoracion))
+                        Text("Horas totales: ${uiState.horasTotales}")
+                    }
+                }
 
-                Text("Pendientes")
-                Text("$pendientes")
-
-                Text("Finalizados")
-                Text("$finalizados")
-
-                Text("Media valoración")
-                Text("%.2f".format(media))
-
-                Text("Horas totales")
-                Text("$horas")
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Volver")
+                }
             }
         }
-
-        //Botón para volver
-        Button(
-            onClick = { navController.popBackStack() },
-        ) {
-            Text("Volver")
-        }
     }
 }
-

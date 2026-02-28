@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "922632573424",
+    "project_id": "otrappartida",
+    "storage_bucket": "otrappartida.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922632573424:android:89255461d304290ce20d35",
+        "android_client_info": {
+          "package_name": "com.victhor.appvideojuegos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7TgTTI2xIXmJzQyVby_z3-Bf_9oGsyx8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

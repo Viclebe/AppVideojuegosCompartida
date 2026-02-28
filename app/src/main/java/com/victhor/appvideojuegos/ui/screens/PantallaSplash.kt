@@ -21,7 +21,7 @@ import com.victhor.appvideojuegos.R
 fun PantallaSplash(navController: NavController) {
     //Efecto que se ejecuta una sola vez
     LaunchedEffect(Unit) {
-        delay(5000)
+        delay(1000)
         navController.navigate(Routes.Onboarding.route) {
             popUpTo(Routes.Splash.route) {
                 inclusive = true
