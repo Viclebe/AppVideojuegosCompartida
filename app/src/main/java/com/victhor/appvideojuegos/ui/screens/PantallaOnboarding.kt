@@ -63,7 +63,7 @@ fun PantallaOnboarding(
 
         // Botón a pantalla principal
         Button(
-            onClick = { navController.navigate(Routes.Principal.route) },
+            onClick = { navController.navigate(Routes.Login.route) },
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .height(48.dp),

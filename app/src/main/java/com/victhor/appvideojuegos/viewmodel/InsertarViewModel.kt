@@ -1,14 +1,14 @@
 package com.victhor.appvideojuegos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
+import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
 
 // --- UI STATE ---
 data class InsertarUiState(
@@ -26,10 +26,7 @@ data class InsertarUiState(
 )
 
 // --- VIEWMODEL ---
-class InsertarViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
-    private val repositorio = VideojuegoRepository(dao)
+class InsertarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InsertarUiState())
     val uiState: StateFlow<InsertarUiState> = _uiState
@@ -79,15 +76,16 @@ class InsertarViewModel(application: Application) : AndroidViewModel(application
         if (state.errorHoras || state.errorValoracion || state.errorEstado) return
 
         viewModelScope.launch {
-            repositorio.insertarVideojuego(
+            repository.insertarVideojuego(
                 Videojuego(
-                    id = 0, // 0 para que Room genere id automáticamente
+                    id = 0,
                     titulo = state.titulo,
                     genero = state.genero,
                     plataforma = state.plataforma,
                     estado = state.estado,
                     horasJugadas = state.horasJugadas.toIntOrNull() ?: 0,
-                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0
+                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
+                    usuarioId = Sesion.usuarioId
                 )
             )
 

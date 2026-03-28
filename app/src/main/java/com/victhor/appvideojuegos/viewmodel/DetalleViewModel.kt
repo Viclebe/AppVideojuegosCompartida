@@ -1,9 +1,7 @@
 package com.victhor.appvideojuegos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +16,7 @@ data class DetalleUiState(
 )
 
 // --- VIEWMODEL ---
-class DetalleViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
-    private val repositorio = VideojuegoRepository(dao)
+class DetalleViewModel(private val repository: VideojuegoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DetalleUiState())
     val uiState: StateFlow<DetalleUiState> = _uiState
@@ -29,7 +24,7 @@ class DetalleViewModel(application: Application) : AndroidViewModel(application)
     fun cargarVideojuego(id: Int) {
         viewModelScope.launch {
             try {
-                repositorio.buscarVideojuegoPorId(id).collect { juego ->
+                repository.buscarVideojuegoPorId(id).collect { juego ->
                     _uiState.value = DetalleUiState(
                         videojuego = juego,
                         isLoading = false
@@ -48,7 +43,7 @@ class DetalleViewModel(application: Application) : AndroidViewModel(application)
     fun eliminarVideojuego() {
         val juego = _uiState.value.videojuego ?: return
         viewModelScope.launch {
-            repositorio.eliminarVideojuego(juego)
+            repository.eliminarVideojuego(juego)
             _uiState.value = DetalleUiState(videojuego = null, isLoading = false)
         }
     }

@@ -1,14 +1,14 @@
 package com.victhor.appvideojuegos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.victhor.appvideojuegos.sesion.Sesion
+
 
 data class ModificarUiState(
     val titulo: String = "",
@@ -24,17 +24,14 @@ data class ModificarUiState(
     val guardadoExitoso: Boolean = false
 )
 
-class ModificarViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
-    private val repositorio = VideojuegoRepository(dao)
+class ModificarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ModificarUiState())
     val uiState: StateFlow<ModificarUiState> = _uiState
 
     fun cargarVideojuego(id: Int) {
         viewModelScope.launch {
-            repositorio.buscarVideojuegoPorId(id).collect { juego ->
+            repository.buscarVideojuegoPorId(id).collect { juego ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     titulo = juego.titulo,
@@ -95,15 +92,16 @@ class ModificarViewModel(application: Application) : AndroidViewModel(applicatio
         if (state.errorHoras || state.errorValoracion || state.errorEstado) return
 
         viewModelScope.launch {
-            repositorio.modificarVideojuego(
+            repository.modificarVideojuego(
                 Videojuego(
-                    id = id,
+                    id = 0,
                     titulo = state.titulo,
                     genero = state.genero,
                     plataforma = state.plataforma,
                     estado = state.estado,
                     horasJugadas = state.horasJugadas.toIntOrNull() ?: 0,
-                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0
+                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
+                    usuarioId = Sesion.usuarioId
                 )
             )
             _uiState.value = state.copy(guardadoExitoso = true)

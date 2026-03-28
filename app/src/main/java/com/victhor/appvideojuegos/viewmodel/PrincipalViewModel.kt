@@ -1,9 +1,7 @@
 package com.victhor.appvideojuegos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,22 +14,30 @@ data class PrincipalUiState(
     val error: String? = null
 )
 
-
-class PrincipalViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
-    private val repositorio = VideojuegoRepository(dao)
+class PrincipalViewModel(private val repository: VideojuegoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PrincipalUiState(isLoading = true))
     val uiState: StateFlow<PrincipalUiState> = _uiState
 
     init {
+        cargarVideojuegos()
+    }
+
+    private fun cargarVideojuegos() {
         viewModelScope.launch {
-            repositorio.listarVideojuegos.collect { lista ->
+            try {
+                repository.listarVideojuegos().collect { lista ->
+                    _uiState.value = PrincipalUiState(
+                        listaVideojuegos = lista,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+            } catch (e: Exception) {
                 _uiState.value = PrincipalUiState(
-                    listaVideojuegos = lista,
+                    listaVideojuegos = emptyList(),
                     isLoading = false,
-                    error = null
+                    error = "Error al cargar los videojuegos"
                 )
             }
         }

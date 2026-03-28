@@ -1,5 +1,9 @@
 package com.victhor.appvideojuegos.domain.model
 
+/**
+ * Modelo de dominio que representa un videojuego.
+ * Transportar información entre Repository y la UI.
+ */
 data class Videojuego(
     val id: Int = 0,
     val titulo: String,
@@ -7,5 +11,6 @@ data class Videojuego(
     val plataforma: String,
     val estado: String,
     val horasJugadas: Int,
-    val valoracion: Double
+    val valoracion: Double,
+    val usuarioId: String
 )

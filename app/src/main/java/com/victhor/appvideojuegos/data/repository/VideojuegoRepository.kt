@@ -1,35 +1,52 @@
 package com.victhor.appvideojuegos.data.repository
 
-import androidx.lifecycle.LiveData
 import com.victhor.appvideojuegos.data.local.dao.VideojuegoDAO
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 import com.victhor.appvideojuegos.domain.model.Videojuego
+import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-//---Clase intermediaria entre BBDD y domain/UI
-//Transfiere las entidades
+/**
+ * Repositorio: clase intermediaria entre BBDD DAO y UI.
+ * Recoge los datos y convierte las entidades en objetos (modelos de dominio).
+ *
+ * Las funciones suspend porque realiza una operación de base de datos que puede tardar
+ * y debe ejecutarse dentro de una coroutine (viewModelScope.launch) para no bloquear la UI (hilos).
+ */
 class VideojuegoRepository(private val dao: VideojuegoDAO) {
 
-    //LiveData para la lista de videojuegos, convierte videojuegoEntity en VIdeojuego
-    val listarVideojuegos: Flow<List<Videojuego>> =
-        dao.obtenerTodosVideojuegos().map { entidades ->
-            entidades.map {
-                Videojuego(
-                    id = it.id,
-                    titulo = it.titulo,
-                    genero = it.genero,
-                    plataforma = it.plataforma,
-                    estado = it.estado,
-                    horasJugadas = it.horasJugadas,
-                    valoracion = it.valoracion
-                )
+    /**
+     * Listar videojuegos, convierte videojuegoEntity en un objeto Videojuego para devolver la lista.
+     *
+     * @return List tipo Flow con los videojuegos de un usuario (usuarioId).
+     */
+    fun listarVideojuegos(): Flow<List<Videojuego>> {
+        // Llamada al DAO para obtener videojuegos del usuarioId
+        return dao.obtenerVideojuegosPorUsuarioId(Sesion.usuarioId)
+            .map { entidades -> // Transforma la lista de entidades
+                entidades.map { // convertir Entity en objeto
+                    Videojuego(
+                        id = it.id,
+                        titulo = it.titulo,
+                        genero = it.genero,
+                        plataforma = it.plataforma,
+                        estado = it.estado,
+                        horasJugadas = it.horasJugadas,
+                        valoracion = it.valoracion,
+                        usuarioId = it.usuarioId
+                    )
+                }
             }
-        }
+    }
 
-    //Insertar en la BBDD
+    /**
+     * Insertar videojuego, funciona al revés, convierte el objeto videojuego en una Entity.
+     *
+     * @param videojuego insertado.
+     */
     suspend fun insertarVideojuego(videojuego: Videojuego) {
-        dao.insertar(
+        dao.insertar( //Convertir el objeto en entity para guardarlo en Room
             VideojuegoEntity(
                 id = videojuego.id,
                 titulo = videojuego.titulo,
@@ -37,14 +54,19 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                 plataforma = videojuego.plataforma,
                 estado = videojuego.estado,
                 horasJugadas = videojuego.horasJugadas,
-                valoracion = videojuego.valoracion
+                valoracion = videojuego.valoracion,
+                usuarioId = Sesion.usuarioId
             )
         )
     }
 
-    //Modificar
+    /**
+     * Actualizar videojuego existente. Convierte de objeto videojuego a entity.
+     *
+     * @param videojuego con los datos actualizados.
+     */
     suspend fun modificarVideojuego(videojuego: Videojuego) {
-        dao.modificar(
+        dao.modificar( //Convertir el objeto en entity para modificarlo en Room
             VideojuegoEntity(
                 id = videojuego.id,
                 titulo = videojuego.titulo,
@@ -52,46 +74,42 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                 plataforma = videojuego.plataforma,
                 estado = videojuego.estado,
                 horasJugadas = videojuego.horasJugadas,
-                valoracion = videojuego.valoracion
+                valoracion = videojuego.valoracion,
+                usuarioId = Sesion.usuarioId
             )
         )
     }
 
-    //Eliminar
+    /**
+     * Eliminar videojuego de la BD.
+     *
+     * @param videojuego a eliminar.
+     */
     suspend fun eliminarVideojuego(videojuego: Videojuego) {
         dao.eliminar(
-            VideojuegoEntity(
+            VideojuegoEntity( //Convertir el objeto en entity para eliminarlo en Room
                 id = videojuego.id,
                 titulo = videojuego.titulo,
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
                 estado = videojuego.estado,
                 horasJugadas = videojuego.horasJugadas,
-                valoracion = videojuego.valoracion
+                valoracion = videojuego.valoracion,
+                usuarioId = Sesion.usuarioId
             )
         )
     }
 
-    //Buscar videojuego por id (para detalles y modificar)
+    /**
+     * Buscar videojuego por el id del usuario (para detalles y modificar).
+     * Convierte videojuegoEntity en un objeto Videojuego tipo Flow.
+     *
+     * @param id del videojuego.
+     * @return Videojuego encontrado.
+     */
     fun buscarVideojuegoPorId(id: Int): Flow<Videojuego> {
-        return dao.obtenerVideojuegoPorId(id).map {
-            Videojuego(
-                id = it.id,
-                titulo = it.titulo,
-                genero = it.genero,
-                plataforma = it.plataforma,
-                estado = it.estado,
-                horasJugadas = it.horasJugadas,
-                valoracion = it.valoracion
-
-            )
-        }
-    }
-
-    //Buscar videojuego por texto (para buscar)
-    fun buscarVideojuego(texto: String): Flow<List<Videojuego>> {
-        return dao.buscarVideojuegos(texto).map { entidades ->
-            entidades.map {
+        return dao.obtenerVideojuegoPorId(id, Sesion.usuarioId)
+            .map { // Transforma la lista de entidades y convertir Entity en objeto
                 Videojuego(
                     id = it.id,
                     titulo = it.titulo,
@@ -99,19 +117,68 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                     plataforma = it.plataforma,
                     estado = it.estado,
                     horasJugadas = it.horasJugadas,
-                    valoracion = it.valoracion
+                    valoracion = it.valoracion,
+                    usuarioId = it.usuarioId
                 )
             }
-
-        }
     }
 
-    //Estadísticas
-    fun contarVideojuegos(): Flow<Int> = dao.obtenerSumaVideojuegos()
-    fun contarPorEstado(estado: String): Flow<Int> = dao.obtenerSumaPorEstado(estado)
-    fun mediaValoracion(): Flow<Double> = dao.obtenerMediaValoracion()
-    fun contarHorasJugadas(): Flow<Int> = dao.obtenerHorasTotales()
+    /**
+     * Buscar videojuego por texto (para buscar por título, género, platadorma o estado).
+     * Convierte videojuegoEntity en un objeto Videojuego para devolver la lista.
+     *
+     * @param texto que será introducido en la UI.
+     * @return List tipo Flow de videojuegos con coincidencia.
+     */
+    fun buscarVideojuego(texto: String): Flow<List<Videojuego>> {
+        return dao.buscarVideojuegos(Sesion.usuarioId, texto)
+            .map { entidades -> // Transforma la lista de entidades
+                entidades.map { // Convertir Entity en objeto
+                    Videojuego(
+                        id = it.id,
+                        titulo = it.titulo,
+                        genero = it.genero,
+                        plataforma = it.plataforma,
+                        estado = it.estado,
+                        horasJugadas = it.horasJugadas,
+                        valoracion = it.valoracion,
+                        usuarioId = it.usuarioId
+                    )
+                }
+            }
+    }
 
-    //Eliminar todo
-    fun eliminarTodo() = dao.eliminarTodaBiblioteca()
+    /**
+     * Eliminar biblioteca entera del usuario actual (usuarioId).
+     */
+    suspend fun eliminarTodo() {
+        dao.eliminarTodaBiblioteca(Sesion.usuarioId)
+    }
+
+    //-------------------Estadísticas-------------
+
+    /**
+     * Número total de videojuegos del usuario (usuarioId).
+     */
+    fun contarVideojuegos(): Flow<Int> = dao.obtenerSumaVideojuegos(Sesion.usuarioId)
+
+    /**
+     * Número total de videojuegos por estado (jugando, pendiente, finalizado), de un usuario (usuarioId).
+     *
+     * @param estado del videojuego.
+     */
+    fun contarPorEstado(estado: String): Flow<Int> =
+        dao.obtenerSumaPorEstado(estado, Sesion.usuarioId)
+
+    /**
+     * Valoración media de la biblioteca del usuario (usuarioId).
+     */
+    fun mediaValoracion(): Flow<Double> = dao.obtenerMediaValoracion(Sesion.usuarioId)
+
+    /**
+     * Eliminar biblioteca completa de videojuegos del usuario actual (usuarioId).
+     */
+    fun contarHorasJugadas(): Flow<Int> = dao.obtenerHorasTotales(Sesion.usuarioId)
+
+
 }

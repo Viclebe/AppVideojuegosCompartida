@@ -1,9 +1,7 @@
 package com.victhor.appvideojuegos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +15,7 @@ data class BuscarUiState(
     val isLoading: Boolean = false
 )
 
-class BuscarViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val dao = VideojuegoDatabase.obtenerInstancia(application).videojuegoDao()
-    private val repositorio = VideojuegoRepository(dao)
+class BuscarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BuscarUiState())
     val uiState: StateFlow<BuscarUiState> = _uiState
@@ -33,14 +28,14 @@ class BuscarViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             if (texto.isBlank()) {
-                repositorio.listarVideojuegos.collect { lista ->
+                repository.listarVideojuegos().collect { lista ->
                     _uiState.value = _uiState.value.copy(
                         resultados = lista,
                         isLoading = false
                     )
                 }
             } else {
-                repositorio.buscarVideojuego(texto).collectLatest { lista ->
+                repository.buscarVideojuego(texto).collectLatest { lista ->
                     _uiState.value = _uiState.value.copy(
                         resultados = lista,
                         isLoading = false
