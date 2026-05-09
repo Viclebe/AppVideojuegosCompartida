@@ -3,13 +3,14 @@ package com.victhor.appvideojuegos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
+import com.victhor.appvideojuegos.domain.model.Comentario
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-data class PrincipalUiState(
+data class ComunidadUiState(
     val listaVideojuegos: List<Videojuego> = emptyList(),
     val filtroEstado: String? = null,
     val soloFavoritos: Boolean = false,
@@ -17,10 +18,10 @@ data class PrincipalUiState(
     val error: String? = null
 )
 
-class PrincipalViewModel(private val repository: VideojuegoFirebaseRepository) : ViewModel() {
+class ComunidadViewModel(private val repository: VideojuegoFirebaseRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PrincipalUiState(isLoading = true))
-    val uiState: StateFlow<PrincipalUiState> = _uiState
+    private val _uiState = MutableStateFlow(ComunidadUiState(isLoading = true))
+    val uiState: StateFlow<ComunidadUiState> = _uiState
 
     fun cambiarFiltroEstado(estado: String?) {
         _uiState.value = _uiState.value.copy(filtroEstado = estado)
@@ -33,10 +34,10 @@ class PrincipalViewModel(private val repository: VideojuegoFirebaseRepository) :
     }
 
     fun cargarVideojuegos() {
-    viewModelScope.launch {
+        viewModelScope.launch {
             try {
                 // Pasamos el usuario activo actual guardado en la Sesion hacia Firebase
-                repository.listarVideojuegos(Sesion.usuarioId).collect { lista ->
+                repository.listarTotalComunidad().collect { lista ->
                     val filtrada = lista.filter { juego ->
                         val cumpleEstado = _uiState.value.filtroEstado == null || juego.estado == _uiState.value.filtroEstado
                         val cumpleFavoritos = !_uiState.value.soloFavoritos || juego.favorito

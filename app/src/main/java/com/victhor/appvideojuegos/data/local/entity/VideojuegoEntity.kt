@@ -15,9 +15,6 @@ data class VideojuegoEntity(
     val titulo: String,
     val genero: String, //Acción, Aventura, Rol, Estrategia, Simulación, Plataformas, Deportes, Puzzle y Arcade
     val plataforma: String, //PS5, Xbox, Nintendo Switch, PC
-    val estado: String, //Jugando, pendiente, finalizado
-    val horasJugadas: Int,
     val valoracion: Double, // 0 a 5
-    //Clave foránea
-    val usuarioId: String //Relación videojuego-usuario
+    val usuarioId: String // Clave foránea. Relación videojuego-usuario
 )

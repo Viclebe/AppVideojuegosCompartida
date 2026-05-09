@@ -6,9 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.victhor.appvideojuegos.data.local.dao.ComentarioDAO
 import com.victhor.appvideojuegos.data.local.dao.UsuarioDAO
+import com.victhor.appvideojuegos.data.local.dao.UsuarioVideojuegoDAO
+import com.victhor.appvideojuegos.data.local.dao.ValoracionDAO
+
 import com.victhor.appvideojuegos.data.local.dao.VideojuegoDAO
+import com.victhor.appvideojuegos.data.local.entity.ComentarioEntity
 import com.victhor.appvideojuegos.data.local.entity.UsuarioEntity
+import com.victhor.appvideojuegos.data.local.entity.UsuarioVideojuegoEntity
+import com.victhor.appvideojuegos.data.local.entity.ValoracionEntity
+
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 
 /**
@@ -16,22 +24,23 @@ import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
  * Con Room se genera automáticamente la implementación en tiempo de compilación.
  * Crea las database a partir de las entidades UsuarioEntity y VideojuegoEntity.
  */
-@Database(entities = [VideojuegoEntity::class, UsuarioEntity::class], version = 3)
+@Database(
+    entities = [VideojuegoEntity::class, UsuarioEntity::class, ComentarioEntity::class, ValoracionEntity::class, UsuarioVideojuegoEntity::class],
+    version = 7
+)
 abstract class VideojuegoDatabase : RoomDatabase() {
 
     /**
-     * Acceso al DAO videojuegosDAO con Room.
+     * Acceso a los DAOs con Room.
      *
-     * @return instancia VideojuegosDAO.
+     * @return instanciasde los DAOs.
      */
     abstract fun videojuegoDao(): VideojuegoDAO
-
-    /**
-     * Acceso al DAO UsuarioDAO.
-     *
-     * @return instancia UsuarioDAO.
-     */
     abstract fun usuarioDao(): UsuarioDAO
+    abstract fun comentarioDao(): ComentarioDAO
+    abstract fun valoracionDao(): ValoracionDAO
+    abstract fun usuarioVideojuegoDao(): UsuarioVideojuegoDAO
+
 
     companion object { //Objeto estático para almacenar elementos accesibles sin crear la clase
 

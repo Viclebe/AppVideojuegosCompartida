@@ -3,7 +3,6 @@ package com.victhor.appvideojuegos.data.repository
 import com.victhor.appvideojuegos.data.local.dao.UsuarioDAO
 import com.victhor.appvideojuegos.data.local.entity.UsuarioEntity
 import com.victhor.appvideojuegos.domain.model.Usuario
-import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

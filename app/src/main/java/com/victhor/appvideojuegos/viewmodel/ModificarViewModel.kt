@@ -3,6 +3,9 @@ package com.victhor.appvideojuegos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
+import com.victhor.appvideojuegos.domain.model.UsuarioVideojuego
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,33 +17,41 @@ data class ModificarUiState(
     val titulo: String = "",
     val genero: String = "",
     val plataforma: String = "",
-    val estado: String = "",
-    val horasJugadas: String = "",
     val valoracion: String = "",
+    val estado: String = "Pendiente",
+    val horasJugadas: String = "0",
+    val isFavorito: Boolean = false,
     val isLoading: Boolean = true,
-    val errorHoras: Boolean = false,
     val errorValoracion: Boolean = false,
-    val errorEstado: Boolean = false,
-    val guardadoExitoso: Boolean = false
+    val errorHoras: Boolean = false,
+    val guardadoExitoso: Boolean = false,
+    val idDeFirebase: String = "" // Guardamos el ID de texto aquí
 )
 
-class ModificarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
+class ModificarViewModel(
+    private val repository: VideojuegoRepository,
+    private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
+    private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ModificarUiState())
     val uiState: StateFlow<ModificarUiState> = _uiState
 
-    fun cargarVideojuego(id: Int) {
+    fun cargarVideojuego(idFirestore: String) {
         viewModelScope.launch {
-            repository.buscarVideojuegoPorId(id).collect { juego ->
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    titulo = juego.titulo,
-                    genero = juego.genero,
-                    plataforma = juego.plataforma,
-                    estado = juego.estado,
-                    horasJugadas = juego.horasJugadas.toString(),
-                    valoracion = juego.valoracion.toString()
-                )
+            videojuegoFirebaseRepository.buscarPorId(idFirestore).collect { juego ->
+                juego?.let {
+                    _uiState.value = _uiState.value.copy(
+                        titulo = it.titulo,
+                        genero = it.genero,
+                        plataforma = it.plataforma,
+                        valoracion = it.valoracion.toString(),
+                        estado = it.estado ?: "Pendiente",
+                        isFavorito = it.favorito,
+                        idDeFirebase = it.firestoreId,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -49,30 +60,12 @@ class ModificarViewModel(private val repository: VideojuegoRepository) : ViewMod
         _uiState.value = _uiState.value.copy(titulo = nuevoTitulo)
     }
 
-    fun guardarCambiosHorasJugadas(valor: String) {
-        val error = valor.toIntOrNull()?.let { it < 0 } ?: false
-        _uiState.value = _uiState.value.copy(
-            horasJugadas = valor,
-            errorHoras = error
-        )
-    }
-
     fun guardarCambiosGenero(nuevoGenero: String) {
         _uiState.value = _uiState.value.copy(genero = nuevoGenero)
     }
 
     fun guardarCambiosPlataforma(nuevaPlataforma: String) {
         _uiState.value = _uiState.value.copy(plataforma = nuevaPlataforma)
-    }
-
-    fun guardarCambiosEstado(nuevoEstado: String) {
-        val estadosCorrectos = listOf("Jugando", "Pendiente", "Finalizado")
-        val error = nuevoEstado.isNotBlank() && nuevoEstado !in estadosCorrectos
-
-        _uiState.value = _uiState.value.copy(
-            estado = nuevoEstado,
-            errorEstado = error
-        )
     }
 
     fun guardarCambiosValoracion(nuevaValoracion: String) {
@@ -86,24 +79,39 @@ class ModificarViewModel(private val repository: VideojuegoRepository) : ViewMod
         )
     }
 
-    fun guardar(id: Int) {
+    fun guardarCambiosEstado(nuevoEstado: String) {
+        _uiState.value = _uiState.value.copy(estado = nuevoEstado)
+    }
+
+    fun guardarCambiosHoras(valor: String) {
+        val error = valor.toIntOrNull() == null || valor.toInt() < 0
+        _uiState.value = _uiState.value.copy(
+            horasJugadas = valor,
+            errorHoras = error
+        )
+    }
+
+    fun guardar() { 
         val state = _uiState.value
 
-        if (state.errorHoras || state.errorValoracion || state.errorEstado) return
+        if (state.errorValoracion || state.errorHoras) return
 
         viewModelScope.launch {
-            repository.modificarVideojuego(
-                Videojuego(
-                    id = 0,
-                    titulo = state.titulo,
-                    genero = state.genero,
-                    plataforma = state.plataforma,
-                    estado = state.estado,
-                    horasJugadas = state.horasJugadas.toIntOrNull() ?: 0,
-                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
-                    usuarioId = Sesion.usuarioId
-                )
+            val juegoEditado = Videojuego(
+                id = 0, // Room un 0 porque ya no se usa
+                titulo = state.titulo,
+                genero = state.genero,
+                plataforma = state.plataforma,
+                valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
+                usuarioId = Sesion.usuarioId,
+                estado = state.estado,
+                favorito = state.isFavorito,
+                firestoreId = state.idDeFirebase
             )
+
+            // Modificar en Firebase usando el ID de texto
+            videojuegoFirebaseRepository.modificarVideojuego(state.idDeFirebase, juegoEditado)
+
             _uiState.value = state.copy(guardadoExitoso = true)
         }
     }

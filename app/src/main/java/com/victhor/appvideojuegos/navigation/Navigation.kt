@@ -10,6 +10,7 @@ import com.victhor.appvideojuegos.ui.screens.*
 import com.victhor.appvideojuegos.ui.screens.PantallaPrincipal
 import com.victhor.appvideojuegos.viewmodel.AjustesViewModel
 import com.victhor.appvideojuegos.viewmodel.BuscarViewModel
+import com.victhor.appvideojuegos.viewmodel.ComunidadViewModel
 import com.victhor.appvideojuegos.viewmodel.DetalleViewModel
 import com.victhor.appvideojuegos.viewmodel.EstadisticasViewModel
 import com.victhor.appvideojuegos.viewmodel.InsertarViewModel
@@ -33,7 +34,8 @@ fun Navigation( // declarar ViewModels
     buscarViewModel: BuscarViewModel,
     ajustesViewModel: AjustesViewModel,
     loginViewModel: LoginViewModel,
-    perfilViewModel: PerfilViewModel
+    perfilViewModel: PerfilViewModel,
+    comunidadViewModel: ComunidadViewModel
 ) {
 
     //Es un controlador de navegación que permite cambiar entre pantallas
@@ -70,11 +72,11 @@ fun Navigation( // declarar ViewModels
             route = Routes.Modificar.route + "/{id}", // La ruta varía según el id que recibe
             arguments = listOf( // Lista de parámetros que espera la ruta
                 navArgument("id") {
-                    type = NavType.IntType
-                } // Tipo de argumento que será el id (Int)
+                    type = NavType.StringType
+                } // Tipo de argumento que será el id (antes Int ahora String por Firebase)
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments!!.getInt("id")
+            val id = backStackEntry.arguments?.getString("id") ?: ""
 
             PantallaModificar(
                 navController = navController,
@@ -86,10 +88,10 @@ fun Navigation( // declarar ViewModels
         composable(
             route = Routes.Detalle.route + "/{id}",
             arguments = listOf(
-                navArgument("id") { type = NavType.IntType }
+                navArgument("id") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments!!.getInt("id")
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             PantallaDetalle(
                 navController = navController,
                 viewModel = detalleViewModel,
@@ -121,5 +123,11 @@ fun Navigation( // declarar ViewModels
         composable(Routes.Perfil.route) {
             PantallaPerfil(perfilViewModel, navController)
         }
+
+        // COMUNIDAD
+        composable(Routes.Comunidad.route) {
+            PantallaComunidad(navController, comunidadViewModel)
+        }
+
     }
 }

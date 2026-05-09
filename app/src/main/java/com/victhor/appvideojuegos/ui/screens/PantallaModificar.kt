@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
@@ -23,22 +24,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.victhor.appvideojuegos.viewmodel.ModificarViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
-
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaModificar(
     navController: NavController,
     viewModel: ModificarViewModel,
-    id: Int
+    id: String
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
 
     // Cargar datos al entrar
     LaunchedEffect(id) {
-        viewModel.cargarVideojuego(id)
+        viewModel.cargarVideojuego(id.toString())
     }
 
     // Volver atrás cuando se guarde
@@ -91,42 +92,11 @@ fun PantallaModificar(
                     label = { Text("Plataforma") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                OutlinedTextField(
-                    value = uiState.estado,
-                    onValueChange = viewModel::guardarCambiosEstado,
-                    label = { Text("Estado") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (uiState.errorEstado) {
-                    Text(
-                        text = "Estado inválido. Usa: Jugando, Pendiente o Finalizado",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                OutlinedTextField(
-                    value = uiState.horasJugadas,
-                    onValueChange = viewModel::guardarCambiosHorasJugadas,
-                    label = { Text("Horas jugadas") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (uiState.errorHoras) {
-                    Text(
-                        text = "Las horas deben ser 0 o mayores",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
                 OutlinedTextField(
                     value = uiState.valoracion,
                     onValueChange = viewModel::guardarCambiosValoracion,
-                    label = { Text("Valoración (0.0 - 5.0)") },
+                    label = { Text("Valoración (0-5)") },
+                    isError = uiState.errorValoracion,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -139,13 +109,60 @@ fun PantallaModificar(
                     )
                 }
 
+                // --- NUEVO: Estado ---
+                var expanded by remember { mutableStateOf(false) }
+                val opcionesEstado = listOf("Jugando", "Pendiente", "Finalizado")
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = uiState.estado,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Estado") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        opcionesEstado.forEach { opcion ->
+                            DropdownMenuItem(
+                                text = { Text(opcion) },
+                                onClick = {
+                                    viewModel.guardarCambiosEstado(opcion)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // --- NUEVO: Horas Jugadas ---
+                OutlinedTextField(
+                    value = uiState.horasJugadas,
+                    onValueChange = viewModel::guardarCambiosHoras,
+                    label = { Text("Horas Jugadas") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = uiState.errorHoras
+                )
+                if (uiState.errorHoras) {
+                    Text(
+                        text = "Introduce un número válido de horas (mínimo 0)",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
-                    onClick = { viewModel.guardar(id) },
-                    enabled = !uiState.errorHoras &&
-                            !uiState.errorValoracion &&
-                            !uiState.errorEstado,
+                    onClick = { viewModel.guardar() },
+                    enabled = !uiState.errorValoracion && !uiState.errorHoras,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Guardar cambios")

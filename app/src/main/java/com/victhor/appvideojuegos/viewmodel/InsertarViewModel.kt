@@ -3,6 +3,9 @@ package com.victhor.appvideojuegos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
+import com.victhor.appvideojuegos.domain.model.UsuarioVideojuego
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,18 +18,21 @@ data class InsertarUiState(
     val titulo: String = "",
     val genero: String = "",
     val plataforma: String = "",
-    val estado: String = "",
-    val horasJugadas: String = "",
     val valoracion: String = "",
+    val estado: String = "Pendiente",
+    val horasJugadas: String = "0",
     val isLoading: Boolean = false,
-    val errorHoras: Boolean = false,
     val errorValoracion: Boolean = false,
-    val errorEstado: Boolean = false,
+    val errorHoras: Boolean = false,
     val guardadoExitoso: Boolean = false
 )
 
 // --- VIEWMODEL ---
-class InsertarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
+class InsertarViewModel(
+    private val repository: VideojuegoRepository,
+    private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
+    private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InsertarUiState())
     val uiState: StateFlow<InsertarUiState> = _uiState
@@ -44,23 +50,6 @@ class InsertarViewModel(private val repository: VideojuegoRepository) : ViewMode
         _uiState.value = _uiState.value.copy(plataforma = valor)
     }
 
-    fun cambiarEstado(valor: String) {
-        val estadosValidos = listOf("Jugando", "Pendiente", "Finalizado")
-        val error = valor.isNotBlank() && valor !in estadosValidos
-        _uiState.value = _uiState.value.copy(
-            estado = valor,
-            errorEstado = error
-        )
-    }
-
-    fun cambiarHorasJugadas(valor: String) {
-        val error = valor.toIntOrNull()?.let { it < 0 } ?: false
-        _uiState.value = _uiState.value.copy(
-            horasJugadas = valor,
-            errorHoras = error
-        )
-    }
-
     fun cambiarValoracion(valor: String) {
         val error = valor.toDoubleOrNull()?.let { it < 0.0 || it > 5.0 } ?: false
         _uiState.value = _uiState.value.copy(
@@ -69,27 +58,55 @@ class InsertarViewModel(private val repository: VideojuegoRepository) : ViewMode
         )
     }
 
+    fun cambiarEstado(nuevoEstado: String) {
+        _uiState.value = _uiState.value.copy(estado = nuevoEstado)
+    }
+
+    fun cambiarHoras(valor: String) {
+        // PERMITIMOS vacío (será 0) o números positivos. No bloqueamos si está vacío.
+        val error = valor.isNotEmpty() && (valor.toIntOrNull() == null || valor.toInt() < 0)
+        _uiState.value = _uiState.value.copy(
+            horasJugadas = valor,
+            errorHoras = error
+        )
+    }
+
     // --- GUARDAR NUEVO VIDEOJUEGO ---
     fun guardar() {
         val state = _uiState.value
 
-        if (state.errorHoras || state.errorValoracion || state.errorEstado) return
+        if (state.errorValoracion || state.errorHoras) return
 
         viewModelScope.launch {
-            repository.insertarVideojuego(
-                Videojuego(
-                    id = 0,
-                    titulo = state.titulo,
-                    genero = state.genero,
-                    plataforma = state.plataforma,
-                    estado = state.estado,
-                    horasJugadas = state.horasJugadas.toIntOrNull() ?: 0,
-                    valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
-                    usuarioId = Sesion.usuarioId
-                )
+            // Creamos el objeto completo para Firebase
+            val nuevoJuego = Videojuego(
+                id = 0,
+                titulo = state.titulo,
+                genero = state.genero,
+                plataforma = state.plataforma,
+                valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
+                usuarioId = Sesion.usuarioId,
+                estado = state.estado,
+                favorito = false,
+                firestoreId = "",
+                likes = emptyList(),
+                fechaCreacionModificacion = System.currentTimeMillis()
             )
 
-            _uiState.value = state.copy(guardadoExitoso = true)
+            // Guardamos directamente en Firebase
+            try {
+                videojuegoFirebaseRepository.insertarVideojuego(nuevoJuego)
+                _uiState.value = state.copy(guardadoExitoso = true)
+            } catch (e: Exception) {
+                // Si hubiera un error de red, aquí podrías manejarlo
+            }
         }
+    }
+
+    /**
+     * Reiniciar el estado de los videojuegos
+     */
+    fun reiniciarGuardadoExitoso(){
+        _uiState.value= InsertarUiState()
     }
 }

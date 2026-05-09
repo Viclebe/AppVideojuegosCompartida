@@ -6,6 +6,8 @@ import com.victhor.appvideojuegos.domain.model.Videojuego
 import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import com.victhor.appvideojuegos.data.local.dao.UsuarioVideojuegoDAO
 
 /**
  * Repositorio: clase intermediaria entre BBDD DAO y UI.
@@ -14,7 +16,10 @@ import kotlinx.coroutines.flow.map
  * Las funciones suspend porque realiza una operación de base de datos que puede tardar
  * y debe ejecutarse dentro de una coroutine (viewModelScope.launch) para no bloquear la UI (hilos).
  */
-class VideojuegoRepository(private val dao: VideojuegoDAO) {
+class VideojuegoRepository(
+    private val dao: VideojuegoDAO,
+    private val usuarioVideojuegoDao: UsuarioVideojuegoDAO
+) {
 
     /**
      * Listar videojuegos, convierte videojuegoEntity en un objeto Videojuego para devolver la lista.
@@ -22,22 +27,24 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
      * @return List tipo Flow con los videojuegos de un usuario (usuarioId).
      */
     fun listarVideojuegos(): Flow<List<Videojuego>> {
-        // Llamada al DAO para obtener videojuegos del usuarioId
-        return dao.obtenerVideojuegosPorUsuarioId(Sesion.usuarioId)
-            .map { entidades -> // Transforma la lista de entidades
-                entidades.map { // convertir Entity en objeto
-                    Videojuego(
-                        id = it.id,
-                        titulo = it.titulo,
-                        genero = it.genero,
-                        plataforma = it.plataforma,
-                        estado = it.estado,
-                        horasJugadas = it.horasJugadas,
-                        valoracion = it.valoracion,
-                        usuarioId = it.usuarioId
-                    )
-                }
+        val juegosFlow = dao.obtenerVideojuegosPorUsuarioId(Sesion.usuarioId)
+        val progresosFlow = usuarioVideojuegoDao.obtenerTodosLosProgresos(Sesion.usuarioId)
+
+        return combine(juegosFlow, progresosFlow) { juegos, progresos ->
+            juegos.map { entity ->
+                val progreso = progresos.find { it.videojuegoId == entity.id }
+                Videojuego(
+                    id = entity.id,
+                    titulo = entity.titulo,
+                    genero = entity.genero,
+                    plataforma = entity.plataforma,
+                    valoracion = entity.valoracion,
+                    usuarioId = entity.usuarioId,
+                    estado = progreso?.estado ?: "Pendiente",
+                    favorito = progreso?.favorito ?: false
+                )
             }
+        }
     }
 
     /**
@@ -45,19 +52,17 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
      *
      * @param videojuego insertado.
      */
-    suspend fun insertarVideojuego(videojuego: Videojuego) {
-        dao.insertar( //Convertir el objeto en entity para guardarlo en Room
+    suspend fun insertarVideojuego(videojuego: Videojuego): Int {
+        return dao.insertar( //Convertir el objeto en entity para guardarlo en Room
             VideojuegoEntity(
                 id = videojuego.id,
                 titulo = videojuego.titulo,
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
-                estado = videojuego.estado,
-                horasJugadas = videojuego.horasJugadas,
                 valoracion = videojuego.valoracion,
                 usuarioId = Sesion.usuarioId
             )
-        )
+        ).toInt()
     }
 
     /**
@@ -72,8 +77,6 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                 titulo = videojuego.titulo,
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
-                estado = videojuego.estado,
-                horasJugadas = videojuego.horasJugadas,
                 valoracion = videojuego.valoracion,
                 usuarioId = Sesion.usuarioId
             )
@@ -92,8 +95,6 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                 titulo = videojuego.titulo,
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
-                estado = videojuego.estado,
-                horasJugadas = videojuego.horasJugadas,
                 valoracion = videojuego.valoracion,
                 usuarioId = Sesion.usuarioId
             )
@@ -115,8 +116,6 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
                     titulo = it.titulo,
                     genero = it.genero,
                     plataforma = it.plataforma,
-                    estado = it.estado,
-                    horasJugadas = it.horasJugadas,
                     valoracion = it.valoracion,
                     usuarioId = it.usuarioId
                 )
@@ -131,21 +130,24 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
      * @return List tipo Flow de videojuegos con coincidencia.
      */
     fun buscarVideojuego(texto: String): Flow<List<Videojuego>> {
-        return dao.buscarVideojuegos(Sesion.usuarioId, texto)
-            .map { entidades -> // Transforma la lista de entidades
-                entidades.map { // Convertir Entity en objeto
-                    Videojuego(
-                        id = it.id,
-                        titulo = it.titulo,
-                        genero = it.genero,
-                        plataforma = it.plataforma,
-                        estado = it.estado,
-                        horasJugadas = it.horasJugadas,
-                        valoracion = it.valoracion,
-                        usuarioId = it.usuarioId
-                    )
-                }
+        val busquedaFlow = dao.buscarVideojuegos(Sesion.usuarioId, texto)
+        val progresosFlow = usuarioVideojuegoDao.obtenerTodosLosProgresos(Sesion.usuarioId)
+
+        return combine(busquedaFlow, progresosFlow) { resultados, progresos ->
+            resultados.map { entity ->
+                val progreso = progresos.find { it.videojuegoId == entity.id }
+                Videojuego(
+                    id = entity.id,
+                    titulo = entity.titulo,
+                    genero = entity.genero,
+                    plataforma = entity.plataforma,
+                    valoracion = entity.valoracion,
+                    usuarioId = entity.usuarioId,
+                    estado = progreso?.estado ?: "Pendiente",
+                    favorito = progreso?.favorito ?: false
+                )
             }
+        }
     }
 
     /**
@@ -163,22 +165,9 @@ class VideojuegoRepository(private val dao: VideojuegoDAO) {
     fun contarVideojuegos(): Flow<Int> = dao.obtenerSumaVideojuegos(Sesion.usuarioId)
 
     /**
-     * Número total de videojuegos por estado (jugando, pendiente, finalizado), de un usuario (usuarioId).
-     *
-     * @param estado del videojuego.
-     */
-    fun contarPorEstado(estado: String): Flow<Int> =
-        dao.obtenerSumaPorEstado(estado, Sesion.usuarioId)
-
-    /**
      * Valoración media de la biblioteca del usuario (usuarioId).
      */
     fun mediaValoracion(): Flow<Double> = dao.obtenerMediaValoracion(Sesion.usuarioId)
-
-    /**
-     * Eliminar biblioteca completa de videojuegos del usuario actual (usuarioId).
-     */
-    fun contarHorasJugadas(): Flow<Int> = dao.obtenerHorasTotales(Sesion.usuarioId)
 
 
 }

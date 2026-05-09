@@ -38,7 +38,7 @@ fun PantallaBuscar(
             OutlinedTextField(
                 value = uiState.textoBusqueda,
                 onValueChange = { viewModel.cambiarTexto(it) },
-                label = { Text("Buscar por título, género, plataforma o estado") },
+                label = { Text("Buscar por título, género o plataforma") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -56,15 +56,53 @@ fun PantallaBuscar(
             } else {
                 LazyColumn {
                     items(uiState.resultados) { videojuego ->
-                        Text(
-                            text = "${videojuego.titulo} · ${videojuego.genero} · ${videojuego.plataforma} · ${videojuego.estado}",
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
                                 .clickable {
                                     navController.navigate(Routes.Detalle.route + "/${videojuego.id}")
                                 }
-                        )
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                text = videojuego.titulo,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            )
+                            
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "${videojuego.genero} · ${videojuego.plataforma}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                if (!videojuego.estado.isNullOrBlank()) {
+                                    val colorEstado = when (videojuego.estado) {
+                                        "Finalizado" -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                                        "Jugando" -> androidx.compose.ui.graphics.Color(0xFF2196F3)
+                                        "Pendiente" -> androidx.compose.ui.graphics.Color(0xFFFF9800)
+                                        else -> androidx.compose.ui.graphics.Color.Gray
+                                    }
+                                    Surface(
+                                        color = colorEstado.copy(alpha = 0.1f),
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                                    ) {
+                                        Text(
+                                            text = videojuego.estado!!,
+                                            color = colorEstado,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                            HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp)
+                        }
                     }
                 }
             }

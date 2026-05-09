@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-//import com.victhor.appvideojuegos.data.local.entity.UsuarioEntity
 import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -39,7 +38,7 @@ interface VideojuegoDAO {
      * @param VideojuegoEntity para insertar.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE) // si ya existe, reemplaza el usuario
-    suspend fun insertar(videojuego: VideojuegoEntity)
+    suspend fun insertar(videojuego: VideojuegoEntity): Long
 
     /**
      * Actualizar videojuego ya creado en la base de datos.
@@ -76,7 +75,7 @@ interface VideojuegoDAO {
      * @param texto con el que realizará la búsqueda.
      * @return List de videojuegos que coincidan.
      */
-    @Query("SELECT * FROM videojuegos WHERE usuarioId = :usuarioId AND (titulo LIKE '%' || :texto || '%' OR genero LIKE '%' || :texto || '%' OR plataforma LIKE '%' || :texto || '%' OR estado LIKE '%' || :texto || '%') ")
+    @Query("SELECT * FROM videojuegos WHERE usuarioId = :usuarioId AND (titulo LIKE '%' || :texto || '%' OR genero LIKE '%' || :texto || '%' OR plataforma LIKE '%' || :texto || '%') ")
     fun buscarVideojuegos(usuarioId: String, texto: String): Flow<List<VideojuegoEntity>>
 
     /**
@@ -87,13 +86,6 @@ interface VideojuegoDAO {
     @Query("DELETE FROM videojuegos WHERE usuarioId = :usuarioId")
     suspend fun eliminarTodaBiblioteca(usuarioId: String)
 
-    /**
-     * Obtener videojuego por el id del usuario.
-     * Es de tipo Flow para que puedan ejecutarse cambios en la base de datos en tiempo real.
-     *
-     * @param usuarioId
-     * @return List de videojuegos de un usuario en concreto.
-     */
     @Query("SELECT * FROM videojuegos WHERE usuarioId = :usuarioId ORDER BY titulo")
     fun obtenerVideojuegosPorUsuarioId(usuarioId: String): Flow<List<VideojuegoEntity>>
 
@@ -119,17 +111,6 @@ interface VideojuegoDAO {
     fun obtenerSumaVideojuegos(usuarioId: String): Flow<Int>
 
     /**
-     * Número total de videojuegos según estado (completado, pendiente o jugando).
-     * Es de tipo Flow para que puedan ejecutarse cambios en la base de datos en tiempo real.
-     *
-     * @param estado del videojuego.
-     * @param usuarioId
-     * @return Int total de videojuegos con ese estado.
-     */
-    @Query("SELECT COUNT(*) FROM videojuegos WHERE estado = :estado AND usuarioId = :usuarioId")
-    fun obtenerSumaPorEstado(estado: String, usuarioId: String): Flow<Int>
-
-    /**
      * Media de la valoración de todos los videojuegos de un usuario.
      * Es de tipo Flow para que puedan ejecutarse cambios en la base de datos en tiempo real.
      *
@@ -138,14 +119,4 @@ interface VideojuegoDAO {
      */
     @Query("SELECT AVG(valoracion) FROM videojuegos WHERE usuarioId = :usuarioId")
     fun obtenerMediaValoracion(usuarioId: String): Flow<Double>
-
-    /**
-     * Suma del total de horas jugadas por un usuario.
-     * Es de tipo Flow para que puedan ejecutarse cambios en la base de datos en tiempo real.
-     *
-     * @param usuarioId
-     * @return Int total de horas jugadas.
-     */
-    @Query("SELECT SUM(horasJugadas) FROM videojuegos WHERE usuarioId = :usuarioId")
-    fun obtenerHorasTotales(usuarioId: String): Flow<Int>
 }

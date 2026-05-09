@@ -6,11 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.victhor.appvideojuegos.navigation.Routes
 import com.victhor.appvideojuegos.ui.theme.AppVideojuegosTheme
 import com.victhor.appvideojuegos.viewmodel.AjustesViewModel
 import com.victhor.appvideojuegos.viewmodel.AppViewModelFactory
 import com.victhor.appvideojuegos.viewmodel.BuscarViewModel
+import com.victhor.appvideojuegos.viewmodel.ComunidadViewModel
 import com.victhor.appvideojuegos.viewmodel.DetalleViewModel
 import com.victhor.appvideojuegos.viewmodel.EstadisticasViewModel
 import com.victhor.appvideojuegos.viewmodel.InsertarViewModel
@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
             val ajustesViewModel: AjustesViewModel = viewModel(factory = factory)
             val loginViewModel: LoginViewModel = viewModel(factory = factory)
             val perfilViewModel: PerfilViewModel = viewModel(factory = factory)
+            val comunidadViewModel: ComunidadViewModel = viewModel(factory = factory)
 
 
             AppVideojuegosTheme(/*darkTheme = ajustesViewModel.cambiarModoOscuro*/) {
@@ -53,7 +54,8 @@ class MainActivity : ComponentActivity() {
                     buscarViewModel = buscarViewModel,
                     ajustesViewModel = ajustesViewModel,
                     loginViewModel = loginViewModel,
-                    perfilViewModel = perfilViewModel
+                    perfilViewModel = perfilViewModel,
+                    comunidadViewModel = comunidadViewModel
                 )
             }
         }

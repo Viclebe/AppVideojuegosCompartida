@@ -80,7 +80,7 @@ fun PantallaPerfil(
                 onClick = {
                     viewModel.cerrarSesion()
                     navController.navigate(Routes.Login.route) {
-                        popUpTo(0) // Borra todo el historial de navegación
+                        popUpTo(0) // Borrar todo el historial de navegación
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)

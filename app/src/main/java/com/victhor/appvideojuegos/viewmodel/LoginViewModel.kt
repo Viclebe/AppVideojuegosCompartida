@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.UsuarioRepository
 import com.victhor.appvideojuegos.domain.model.Usuario
 import com.victhor.appvideojuegos.sesion.Sesion
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 //---UiState----
 data class LoginUiState(
@@ -52,26 +54,37 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
         }
 
         //Lanzar corrutina
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-        // Registrar un usuario simulado, inventamos la uid (Firebase la crea automáticamente después)
         viewModelScope.launch {
-            val uidDeMentiras = "uid123456"
-
             try {
-                val nuevoUsuario = Usuario( //Insertar en Room sin guardar el password
-                    uid = uidDeMentiras,
-                    nombre = "Jugador1",
-                    fechaRegistro = System.currentTimeMillis(),
-                    avatarUrl = null
-                )
-                repository.insertarUsuario(nuevoUsuario)
-                Sesion.usuarioId = uidDeMentiras// Logear usuario
-                _uiState.value = _uiState.value.copy(isLoading = false, loginExitoso = true, error = null)
+                // Crear usuario con Firebase Auth
+                val authResult = FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).await()
+                val firebaseUser = authResult.user
 
+                if (firebaseUser != null) {
+                    val uidDeFirebase = firebaseUser.uid
+                    // Guardar el usuario en Room para tener caché local (Opcional, pero respeta tu código actual)
+                    val nuevoUsuario = Usuario(
+                        uid = uidDeFirebase,
+                        nombre = email.substringBefore("@"), // Nombre por defecto basado en email
+                        fechaRegistro = System.currentTimeMillis(),
+                        avatarUrl = null
+                    )
+                    repository.insertarUsuario(nuevoUsuario)
+                    
+                    // Activamos registroExitoso en lugar de loginExitoso para no forzar la entrada directa
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        registroExitoso = true, // <-- El cambio clave para que vuelva al Login o notifique
+                        error = "Registro exitoso. Ahora puedes iniciar sesión."
+                    )
+                }
             } catch (e: Exception) {
-                //Excepción de Room si el correo ya existe (UsuarioEntity email es unique = true)
-                _uiState.value = _uiState.value.copy(isLoading = false, error = "Este correo ya está registrado.")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "Fallo al registrar: ${e.localizedMessage}"
+                )
             }
         }
     }
@@ -87,31 +100,30 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
         val email = _uiState.value.email
         val password = _uiState.value.password
 
-
         // Comprobar que no son null
         if (email.isBlank() || password.isBlank()) {
             _uiState.value = _uiState.value.copy(error = "Rellene los dos campos, por favor.")
             return // Termina
         }
 
-        // Buscar si en la BBDD existe un usuario con ese email, lanzar corrutina
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
-            val usuarioEncontrado = repository.obtenerUsuarioPorEmail(email)
+            try {
+                // Iniciar sesión con Firebase Auth
+                val authResult = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
+                val firebaseUser = authResult.user
 
-            if (usuarioEncontrado != null) {
-                // Es simulado, todavía no se puede validar pass en Room, guardamos el uid en sesión global, toda la app lo sabe
-                Sesion.usuarioId = usuarioEncontrado.uid
-                // Y de PantallaRegistro ya puede navegar a PantallaPrincipal
-                _uiState.value =
-                    _uiState.value.copy(isLoading = false, loginExitoso = true, error = null)
+                if (firebaseUser != null) {
+                    Sesion.usuarioId = firebaseUser.uid
+                    // Validar si queremos también guardarlo/sincronizarlo en Room (opcional por ahora)
+                    _uiState.value = _uiState.value.copy(isLoading = false, loginExitoso = true, error = null)
+                }
 
-            } else {
-                //Usuario no encontrado
+            } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "El usuario no existe. Regístrate primero."
+                    error = "Fallo al iniciar sesión: Correo o contraseña incorrectos"
                 )
             }
         }
