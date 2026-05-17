@@ -40,8 +40,10 @@ class VideojuegoRepository(
                     plataforma = entity.plataforma,
                     valoracion = entity.valoracion,
                     usuarioId = entity.usuarioId,
-                    estado = progreso?.estado ?: "Pendiente",
-                    favorito = progreso?.favorito ?: false
+                    nombreUsuario = entity.nombreUsuario,
+                            estado = progreso?.estado ?: "Pendiente",
+                    favorito = progreso?.favorito ?: false,
+                    imagenUrl = entity.imagenUrl
                 )
             }
         }
@@ -60,7 +62,9 @@ class VideojuegoRepository(
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
                 valoracion = videojuego.valoracion,
-                usuarioId = Sesion.usuarioId
+                usuarioId = Sesion.usuarioId,
+                nombreUsuario = videojuego.nombreUsuario,
+                imagenUrl = videojuego.imagenUrl
             )
         ).toInt()
     }
@@ -78,7 +82,9 @@ class VideojuegoRepository(
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
                 valoracion = videojuego.valoracion,
-                usuarioId = Sesion.usuarioId
+                usuarioId = Sesion.usuarioId,
+                nombreUsuario = videojuego.nombreUsuario,
+                imagenUrl = videojuego.imagenUrl
             )
         )
     }
@@ -96,7 +102,9 @@ class VideojuegoRepository(
                 genero = videojuego.genero,
                 plataforma = videojuego.plataforma,
                 valoracion = videojuego.valoracion,
-                usuarioId = Sesion.usuarioId
+                usuarioId = Sesion.usuarioId,
+                nombreUsuario = videojuego.nombreUsuario,
+                imagenUrl = videojuego.imagenUrl
             )
         )
     }
@@ -117,7 +125,9 @@ class VideojuegoRepository(
                     genero = it.genero,
                     plataforma = it.plataforma,
                     valoracion = it.valoracion,
-                    usuarioId = it.usuarioId
+                    usuarioId = it.usuarioId,
+                    nombreUsuario = it.nombreUsuario,
+                    imagenUrl = it.imagenUrl
                 )
             }
     }
@@ -143,8 +153,10 @@ class VideojuegoRepository(
                     plataforma = entity.plataforma,
                     valoracion = entity.valoracion,
                     usuarioId = entity.usuarioId,
-                    estado = progreso?.estado ?: "Pendiente",
-                    favorito = progreso?.favorito ?: false
+                    nombreUsuario = entity.nombreUsuario,
+                            estado = progreso?.estado ?: "Pendiente",
+                    favorito = progreso?.favorito ?: false,
+                    imagenUrl = entity.imagenUrl
                 )
             }
         }

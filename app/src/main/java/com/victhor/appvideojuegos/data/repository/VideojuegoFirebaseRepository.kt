@@ -99,6 +99,13 @@ class VideojuegoFirebaseRepository {
     }
 
     /**
+     * Eliminar un único videojuego de Firebase
+     */
+    suspend fun eliminarVideojuego(idFirestore: String) {
+        coleccion.document(idFirestore).delete().await()
+    }
+
+    /**
      * Nuevo método para borrar todos los juegos de un usuario
      *      */
     suspend fun eliminarTodaBiblioteca(usuarioId: String) {

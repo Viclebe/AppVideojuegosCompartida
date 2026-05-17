@@ -1,6 +1,7 @@
 package com.victhor.appvideojuegos.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,19 +11,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import com.victhor.appvideojuegos.R
 import com.victhor.appvideojuegos.navigation.Routes
+import com.victhor.appvideojuegos.ui.theme.AcentoNeonBlue
+import com.victhor.appvideojuegos.ui.theme.AlertaNeonRojo
+import com.victhor.appvideojuegos.ui.theme.FondoPantallaNegro
+import com.victhor.appvideojuegos.ui.theme.TextoSecundarioGris
 import com.victhor.appvideojuegos.viewmodel.LoginViewModel
+import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 
 @Composable
 fun PantallaLogin(
@@ -31,8 +44,8 @@ fun PantallaLogin(
 ) {
     val state by viewModel.uiState.collectAsState() // Obtener estado desde LoginViewModel
 
-    LaunchedEffect(state.loginExitoso) {
-        if (state.loginExitoso) { // Observar si loginExitoso para navegar
+    LaunchedEffect(state.loginExitoso, state.registroExitoso) {
+        if (state.loginExitoso || state.registroExitoso) { // Observar si loginExitoso para navegar
             navController.navigate(Routes.Principal.route) {
                 popUpTo(Routes.Login.route) { inclusive = true } // Evitar volver pantalla atrás
             }
@@ -42,104 +55,102 @@ fun PantallaLogin(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(FondoPantallaNegro)
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        // LOGO
+        // Logo
         Image(
-            painter = painterResource(id = R.drawable.logonombre),
+            painter = painterResource(id = R.drawable.nombre),
             contentDescription = "Logo app",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp), // Reducir un poco
+                .height(180.dp), // Reducir un poco
             contentScale = ContentScale.Fit
         )
 
-        // Texto
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = "Juega · Guarda · Recuerda",
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center
-            )
+        Spacer(modifier = Modifier.height(40.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Convierte cada partida en memoria",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // CAMPOS PARA INICIAR SESIÓN
+        // Campos azul neon
         Column(modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = state.email,
                 onValueChange = { viewModel.cambiarEmail(it) },
                 label = { Text("Correo electrónico") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                shape = RoundedCornerShape(4.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = AcentoNeonBlue,
+                    focusedLabelColor = AcentoNeonBlue,
+                    unfocusedBorderColor = TextoSecundarioGris.copy(alpha = 0.3f),
+                    cursorColor = AcentoNeonBlue
+                )
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             OutlinedTextField(
                 value = state.password,
                 onValueChange = { viewModel.cambiarPassword(it) },
                 label = { Text("Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(4.dp),
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation() // Ocultar contraseña
+                visualTransformation = PasswordVisualTransformation(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = AcentoNeonBlue,
+                    focusedLabelColor = AcentoNeonBlue,
+                    unfocusedBorderColor = TextoSecundarioGris.copy(alpha = 0.3f),
+                    cursorColor = AcentoNeonBlue
+                )
             )
 
-            // MOSTRAR ERROR SI HUBIERA
+            // Error
             if (state.error != null) {
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = state.error ?: "",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    color = AlertaNeonRojo,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
-        // BOTONES
+        // Botones azul neon
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // BOTÓN INICIAR SESIÓN
+            // Iniciar sesion azul neón
             Button(
                 onClick = { viewModel.iniciarSesion() },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AcentoNeonBlue,
+                    contentColor = Color.Black
+                ),
                 enabled = !state.isLoading
             ) {
                 if (state.isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.Black
                     )
                 } else {
-                    Text("Iniciar sesión")
+                    Text("Iniciar sesión", fontWeight = FontWeight.Bold)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // BOTÓN REGISTRARSE
+            // Registrarse
             Button(
                 onClick = { viewModel.registrarUsuario() },
                 modifier = Modifier
@@ -149,10 +160,47 @@ fun PantallaLogin(
                 enabled = !state.isLoading
             ) {
                 Text(
-                    text = "Registrarse",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "REGÍSTRATE AQUÍ",
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
     }
+
+    // --- DIÁLOGO DE NOMBRE (Pégalo al final de la función PantallaLogin) ---
+    if (state.mostrarDialogoNombre) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("IDENTIDAD_REQUERIDA", color = AcentoNeonBlue, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text("Configura tu nombre de usuario para el sistema:", color = Color.White)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = state.nombreUsuario,
+                        onValueChange = { viewModel.cambiarNombreUsuario(it) },
+                        label = { Text("NICKNAME") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AcentoNeonBlue)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Accedemos a Firebase para pillar el UID y terminar el proceso
+                        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                        viewModel.guardarNombreYFinalizar(uid)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AcentoNeonBlue)
+                ) {
+                    Text("CONFIRMAR", color = Color.Black)
+                }
+            },
+            containerColor = FondoPantallaNegro,
+            shape = RoundedCornerShape(8.dp)
+        )
+    }
+
 }

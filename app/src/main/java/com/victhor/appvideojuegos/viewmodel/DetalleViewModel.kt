@@ -32,8 +32,6 @@ data class DetalleUiState(
 
 // --- VIEWMODEL ---
 class DetalleViewModel(
-    private val repository: VideojuegoRepository,
-    private val comentarioRepository: ComentarioRepository,
     private val usuarioRepository: UsuarioRepository,
     private val valoracionRepository: ValoracionRepository,
     private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
@@ -57,6 +55,7 @@ class DetalleViewModel(
                         }
                     } catch (e: Exception) {
                         // Ignorar fallo puntual
+                        e.toString()
                         _uiState.value = _uiState.value.copy(isLoading = false, error = "Error red")
                     }
                 }
@@ -69,7 +68,9 @@ class DetalleViewModel(
                                 comentarios = lista
                             )
                         }
-                    } catch (e: Exception) { }
+                    } catch (e: Exception) {
+                        e.toString()
+                    }
                 }
 
                 // Hilo para obtener el nombre del usuario actual (en sesión)
@@ -86,20 +87,8 @@ class DetalleViewModel(
                     } catch (e: Exception) { }
                 }
 
-                // Hilo para obtener la media de valoración del videojuego
-                // Ahora los likes llaman a la función darLike() de VideojuegoFirebaseRepository
-                /*launch {
-                    valoracionRepository.calcularMediaGlobal(id).collect { double ->
-                        _uiState.value = _uiState.value.copy(
-                            mediaValoracion = double
-                        )
-                    }
-                }
-                */
-
                 // Hilo para obtener los votos totales
                 launch {
-                    // FIXME: De momento usamos 0 hasta migrar valoraciones a Firebase
                     valoracionRepository.contarVotos(0).collect { int ->
                         _uiState.value = _uiState.value.copy(
                             votosTotales = int
@@ -109,7 +98,6 @@ class DetalleViewModel(
 
                 // Cargar estado personal
                 launch {
-                    // FIXME: De momento usamos 0 hasta migrar progreso a Firebase
                     usuarioVideojuegoRepository.obtenerProgreso(0).collect { progreso ->
                         // Si progreso no nulo, actualizar estado
                         _uiState.value = _uiState.value.copy(
@@ -120,6 +108,7 @@ class DetalleViewModel(
                 }
 
             } catch (e: Exception) {
+                e.toString()
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = "Error al cargar los datos en detalle"
@@ -133,7 +122,6 @@ class DetalleViewModel(
         }
     }
 
-
     fun enviarComentario(texto: String, firestoreIdVideojuego: String) {
         if (texto.isBlank()) return
         viewModelScope.launch {
@@ -141,62 +129,18 @@ class DetalleViewModel(
                 texto = texto,
                 fechaComentario = System.currentTimeMillis(),
                 usuarioId = Sesion.usuarioId,
-                nombreUsuario = _uiState.value.nombreUsuario, // Sacamos el nombre del usuario actual del estado
+                nombreUsuario = _uiState.value.nombreUsuario,
                 firestoreIdVideojuego = firestoreIdVideojuego
             )
             videojuegoFirebaseRepository.guardarComentario(nuevoComentario)
         }
     }
 
-    fun enviarValoracion(estrellas: Int, idVideojuego: Int) {
-        viewModelScope.launch {
-            val nuevaValoracion = Valoracion(
-                usuarioId = Sesion.usuarioId,
-                videojuegoId = idVideojuego,
-                puntuacion = estrellas
-            )
-            valoracionRepository.insertarValoracion(nuevaValoracion)
-        }
-    }
-
-    fun eliminarVideojuego() {
+    fun eliminarVideojuego(firestoreId: String) {
         val juego = _uiState.value.videojuego ?: return
         viewModelScope.launch {
-            repository.eliminarVideojuego(juego)
+            videojuegoFirebaseRepository.eliminarVideojuego(juego.firestoreId)
             _uiState.value = DetalleUiState(videojuego = null, isLoading = false)
-        }
-    }
-
-    /**
-     * Alternar favorito (corazón)
-     */
-    fun toggleFavorito() {
-        val juegoId = _uiState.value.videojuego?.id ?: return
-        val nuevoFavorito = _uiState.value.isFavorito
-
-        viewModelScope.launch {
-            val nuevoProgreso = UsuarioVideojuego(
-                videojuegoId = juegoId,
-                favorito = !nuevoFavorito,
-                estado = _uiState.value.estadoPersonal
-            )
-            usuarioVideojuegoRepository.guardarProgreso(nuevoProgreso)
-        }
-    }
-
-    /**
-     * Cambiar el estado.
-     */
-    fun cambiarEstado(nuevoEstado: String) {
-        val juegoId = _uiState.value.videojuego?.id ?: return
-
-        viewModelScope.launch {
-            val nuevoProgreso = UsuarioVideojuego(
-                videojuegoId = juegoId,
-                favorito = _uiState.value.isFavorito,
-                estado = nuevoEstado
-            )
-            usuarioVideojuegoRepository.guardarProgreso(nuevoProgreso)
         }
     }
 }

@@ -25,12 +25,12 @@ data class ModificarUiState(
     val errorValoracion: Boolean = false,
     val errorHoras: Boolean = false,
     val guardadoExitoso: Boolean = false,
-    val idDeFirebase: String = "" // Guardamos el ID de texto aquí
+    val idDeFirebase: String = "",
+    val nombreUsuario: String = "",
+    val imagenUrl: String = ""
 )
 
 class ModificarViewModel(
-    private val repository: VideojuegoRepository,
-    private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
     private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository
 ) : ViewModel() {
 
@@ -49,6 +49,8 @@ class ModificarViewModel(
                         estado = it.estado ?: "Pendiente",
                         isFavorito = it.favorito,
                         idDeFirebase = it.firestoreId,
+                        nombreUsuario = it.nombreUsuario,
+                        imagenUrl = it.imagenUrl,
                         isLoading = false
                     )
                 }
@@ -83,6 +85,10 @@ class ModificarViewModel(
         _uiState.value = _uiState.value.copy(estado = nuevoEstado)
     }
 
+    fun cambiarImagenUrl(valor: String) {
+        _uiState.value = _uiState.value.copy(imagenUrl = valor)
+    }
+    /*
     fun guardarCambiosHoras(valor: String) {
         val error = valor.toIntOrNull() == null || valor.toInt() < 0
         _uiState.value = _uiState.value.copy(
@@ -90,7 +96,7 @@ class ModificarViewModel(
             errorHoras = error
         )
     }
-
+    */
     fun guardar() { 
         val state = _uiState.value
 
@@ -98,18 +104,19 @@ class ModificarViewModel(
 
         viewModelScope.launch {
             val juegoEditado = Videojuego(
-                id = 0, // Room un 0 porque ya no se usa
+                id = 0,
                 titulo = state.titulo,
                 genero = state.genero,
                 plataforma = state.plataforma,
                 valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
                 usuarioId = Sesion.usuarioId,
+                nombreUsuario = state.nombreUsuario,
                 estado = state.estado,
                 favorito = state.isFavorito,
-                firestoreId = state.idDeFirebase
+                firestoreId = state.idDeFirebase,
+                imagenUrl = state.imagenUrl
             )
 
-            // Modificar en Firebase usando el ID de texto
             videojuegoFirebaseRepository.modificarVideojuego(state.idDeFirebase, juegoEditado)
 
             _uiState.value = state.copy(guardadoExitoso = true)

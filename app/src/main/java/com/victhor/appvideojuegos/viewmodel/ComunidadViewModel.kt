@@ -3,9 +3,7 @@ package com.victhor.appvideojuegos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
-import com.victhor.appvideojuegos.domain.model.Comentario
 import com.victhor.appvideojuegos.domain.model.Videojuego
-import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,15 +26,10 @@ class ComunidadViewModel(private val repository: VideojuegoFirebaseRepository) :
         cargarVideojuegos()
     }
 
-    fun alternarFavoritos() {
-        _uiState.value = _uiState.value.copy(soloFavoritos = !_uiState.value.soloFavoritos)
-        cargarVideojuegos()
-    }
-
     fun cargarVideojuegos() {
         viewModelScope.launch {
             try {
-                // Pasamos el usuario activo actual guardado en la Sesion hacia Firebase
+                // Pasar el usuario guardado en la Sesion hacia Firebase
                 repository.listarTotalComunidad().collect { lista ->
                     val filtrada = lista.filter { juego ->
                         val cumpleEstado = _uiState.value.filtroEstado == null || juego.estado == _uiState.value.filtroEstado
@@ -50,6 +43,7 @@ class ComunidadViewModel(private val repository: VideojuegoFirebaseRepository) :
                     )
                 }
             } catch (e: Exception) {
+                e.toString()
                 _uiState.value = _uiState.value.copy(
                     listaVideojuegos = emptyList(),
                     isLoading = false,

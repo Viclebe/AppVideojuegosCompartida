@@ -26,7 +26,7 @@ import com.victhor.appvideojuegos.data.local.entity.VideojuegoEntity
  */
 @Database(
     entities = [VideojuegoEntity::class, UsuarioEntity::class, ComentarioEntity::class, ValoracionEntity::class, UsuarioVideojuegoEntity::class],
-    version = 7
+    version = 9
 )
 abstract class VideojuegoDatabase : RoomDatabase() {
 

@@ -1,4 +1,4 @@
-package com.victhor.appvideojuegos.ui.screens
+/*package com.victhor.appvideojuegos.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +25,8 @@ fun PantallaOnboarding(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+        ,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -76,3 +77,4 @@ fun PantallaOnboarding(
         }
     }
 }
+*/

@@ -82,4 +82,8 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore)
+
+    //Para las URL de las imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 }

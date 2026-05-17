@@ -19,7 +19,6 @@ import com.victhor.appvideojuegos.viewmodel.PrincipalViewModel
 import com.victhor.appvideojuegos.viewmodel.LoginViewModel
 import com.victhor.appvideojuegos.viewmodel.PerfilViewModel
 
-
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +26,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // Instanciamos nuestro Factory pasándole la Application
             val factory = AppViewModelFactory(application)
 
 
@@ -43,7 +41,7 @@ class MainActivity : ComponentActivity() {
             val comunidadViewModel: ComunidadViewModel = viewModel(factory = factory)
 
 
-            AppVideojuegosTheme(/*darkTheme = ajustesViewModel.cambiarModoOscuro*/) {
+            AppVideojuegosTheme {
 
                 Navigation(
                     principalViewModel = principalViewModel,

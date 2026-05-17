@@ -4,14 +4,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 import com.victhor.appvideojuegos.navigation.Routes
+import com.victhor.appvideojuegos.ui.theme.AcentoNeonCyan
+import com.victhor.appvideojuegos.ui.theme.AcentoNeonMagenta
 import com.victhor.appvideojuegos.viewmodel.BuscarViewModel
 
 @Composable
@@ -27,13 +34,23 @@ fun PantallaBuscar(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            Text(
-                text = "Buscar videojuegos",
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = null, tint = AcentoNeonMagenta)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Buscar en tu biblioteca",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AcentoNeonMagenta,
+                    letterSpacing = 2.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(48.dp))
 
             OutlinedTextField(
                 value = uiState.textoBusqueda,
@@ -60,7 +77,7 @@ fun PantallaBuscar(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate(Routes.Detalle.route + "/${videojuego.id}")
+                                    navController.navigate(Routes.Detalle.route + "/${videojuego.firestoreId}")
                                 }
                                 .padding(12.dp)
                         ) {
@@ -82,10 +99,10 @@ fun PantallaBuscar(
 
                                 if (!videojuego.estado.isNullOrBlank()) {
                                     val colorEstado = when (videojuego.estado) {
-                                        "Finalizado" -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
-                                        "Jugando" -> androidx.compose.ui.graphics.Color(0xFF2196F3)
-                                        "Pendiente" -> androidx.compose.ui.graphics.Color(0xFFFF9800)
-                                        else -> androidx.compose.ui.graphics.Color.Gray
+                                        "Finalizado" -> Color(0xFF4CAF50)
+                                        "Jugando" -> Color(0xFF2196F3)
+                                        "Pendiente" -> Color(0xFFFF9800)
+                                        else -> Color.Gray
                                     }
                                     Surface(
                                         color = colorEstado.copy(alpha = 0.1f),
@@ -105,15 +122,6 @@ fun PantallaBuscar(
                         }
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Volver")
             }
         }
     }

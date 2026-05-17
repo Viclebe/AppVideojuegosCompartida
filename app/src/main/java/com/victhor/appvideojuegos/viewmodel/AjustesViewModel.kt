@@ -9,20 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 data class AjustesUiState(
-    val modoOscuro: Boolean = false,
     val mostrarDialogoBorrar: Boolean = false,
 )
 
-//Ahora contruimos con el repositorio de firebase
+//Construir conrepositorio de firebase
 class AjustesViewModel(private val repository: VideojuegoFirebaseRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AjustesUiState())
     val uiState: StateFlow<AjustesUiState> = _uiState
-
-    // Cambiar modo oscuro
-    fun cambiarModoOscuro() {
-        _uiState.value = _uiState.value.copy(modoOscuro = !_uiState.value.modoOscuro)
-    }
 
     // Mostrar diálogo de confirmación
     fun mostrarDialogoBorrar() {

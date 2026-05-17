@@ -35,7 +35,6 @@ class PrincipalViewModel(private val repository: VideojuegoFirebaseRepository) :
     fun cargarVideojuegos() {
     viewModelScope.launch {
             try {
-                // Pasamos el usuario activo actual guardado en la Sesion hacia Firebase
                 repository.listarVideojuegos(Sesion.usuarioId).collect { lista ->
                     val filtrada = lista.filter { juego ->
                         val cumpleEstado = _uiState.value.filtroEstado == null || juego.estado == _uiState.value.filtroEstado

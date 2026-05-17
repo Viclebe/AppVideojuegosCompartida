@@ -2,8 +2,9 @@ package com.victhor.appvideojuegos.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
 import com.victhor.appvideojuegos.domain.model.Videojuego
+import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -15,7 +16,7 @@ data class BuscarUiState(
     val isLoading: Boolean = false
 )
 
-class BuscarViewModel(private val repository: VideojuegoRepository) : ViewModel() {
+class BuscarViewModel(private val repository: VideojuegoFirebaseRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BuscarUiState())
     val uiState: StateFlow<BuscarUiState> = _uiState
@@ -28,16 +29,22 @@ class BuscarViewModel(private val repository: VideojuegoRepository) : ViewModel(
 
         viewModelScope.launch {
             if (texto.isBlank()) {
-                repository.listarVideojuegos().collect { lista ->
+                repository.listarVideojuegos(Sesion.usuarioId).collect { lista ->
                     _uiState.value = _uiState.value.copy(
                         resultados = lista,
                         isLoading = false
                     )
                 }
             } else {
-                repository.buscarVideojuego(texto).collectLatest { lista ->
+                repository.listarVideojuegos(Sesion.usuarioId).collectLatest { lista ->
+                    val filtrada = lista.filter { juego ->
+                        juego.titulo.contains(texto, ignoreCase = true) ||
+                        juego.genero.contains(texto, ignoreCase = true) ||
+                        juego.plataforma.contains(texto, ignoreCase = true) ||
+                        (juego.estado?.contains(texto, ignoreCase = true) ?: false)
+                    }
                     _uiState.value = _uiState.value.copy(
-                        resultados = lista,
+                        resultados = filtrada,
                         isLoading = false
                     )
                 }

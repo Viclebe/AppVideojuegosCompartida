@@ -17,13 +17,11 @@ class AppViewModelFactory(private val application: Application) : ViewModelProvi
         val db = VideojuegoDatabase.obtenerInstancia(application)
         val videojuegoDao = db.videojuegoDao()
         val usuarioDao = db.usuarioDao()
-        val comentarioDao = db.comentarioDao()
         val valoracionDao = db.valoracionDao()
         val usuarioVideojuegoDao = db.usuarioVideojuegoDao()
 
         val repository = VideojuegoRepository(videojuegoDao, usuarioVideojuegoDao)
         val usuarioRepository = UsuarioRepository(usuarioDao)
-        val comentarioRepository = ComentarioRepository(comentarioDao)
         val valoracionRepository = ValoracionRepository(valoracionDao)
         val usuarioVideojuegoRepository = UsuarioVideojuegoRepository(usuarioVideojuegoDao)
 
@@ -51,7 +49,8 @@ class AppViewModelFactory(private val application: Application) : ViewModelProvi
                 InsertarViewModel(
                     repository,
                     usuarioVideojuegoRepository,
-                    firebaseVideojuegoRepository
+                    firebaseVideojuegoRepository,
+                    usuarioRepository
                 ) as T
             }
 
@@ -61,20 +60,16 @@ class AppViewModelFactory(private val application: Application) : ViewModelProvi
 
             modelClass.isAssignableFrom(ModificarViewModel::class.java) -> {
                 ModificarViewModel(
-                    repository,
-                    usuarioVideojuegoRepository,
                     firebaseVideojuegoRepository
                 ) as T
             }
 
             modelClass.isAssignableFrom(EstadisticasViewModel::class.java) -> {
-                EstadisticasViewModel(repository, usuarioVideojuegoRepository) as T
+                EstadisticasViewModel(firebaseVideojuegoRepository) as T
             }
 
             modelClass.isAssignableFrom(DetalleViewModel::class.java) -> {
                 DetalleViewModel(
-                    repository,
-                    comentarioRepository,
                     usuarioRepository,
                     valoracionRepository,
                     usuarioVideojuegoRepository,
@@ -83,7 +78,7 @@ class AppViewModelFactory(private val application: Application) : ViewModelProvi
             }
 
             modelClass.isAssignableFrom(BuscarViewModel::class.java) -> {
-                BuscarViewModel(repository) as T
+                BuscarViewModel(firebaseVideojuegoRepository) as T
             }
 
             else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")

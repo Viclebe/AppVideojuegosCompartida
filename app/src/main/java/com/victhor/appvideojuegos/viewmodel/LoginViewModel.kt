@@ -18,7 +18,9 @@ data class LoginUiState(
     val isLoading: Boolean = false,
     val error: String? = "",
     val registroExitoso: Boolean = false, // Indicarán a ViewModel que puede de navegar
-    val loginExitoso: Boolean = false
+    val loginExitoso: Boolean = false,
+    val nombreUsuario: String = "",
+    val mostrarDialogoNombre: Boolean = false
 )
 
 //---ViewModel-----
@@ -59,7 +61,9 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 // Crear usuario con Firebase Auth
-                val authResult = FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).await()
+                val authResult =
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                        .await()
                 val firebaseUser = authResult.user
 
                 if (firebaseUser != null) {
@@ -72,12 +76,13 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
                         avatarUrl = null
                     )
                     repository.insertarUsuario(nuevoUsuario)
-                    
+
                     // Activamos registroExitoso en lugar de loginExitoso para no forzar la entrada directa
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        registroExitoso = true, // <-- El cambio clave para que vuelva al Login o notifique
-                        error = "Registro exitoso. Ahora puedes iniciar sesión."
+                        registroExitoso = false,
+                        mostrarDialogoNombre = true,
+                        error = null
                     )
                 }
             } catch (e: Exception) {
@@ -111,13 +116,14 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 // Iniciar sesión con Firebase Auth
-                val authResult = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
+                val authResult =
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
                 val firebaseUser = authResult.user
 
                 if (firebaseUser != null) {
                     Sesion.usuarioId = firebaseUser.uid
-                    // Validar si queremos también guardarlo/sincronizarlo en Room (opcional por ahora)
-                    _uiState.value = _uiState.value.copy(isLoading = false, loginExitoso = true, error = null)
+                    _uiState.value =
+                        _uiState.value.copy(isLoading = false, loginExitoso = true, error = null)
                 }
 
             } catch (e: Exception) {
@@ -126,6 +132,30 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
                     error = "Fallo al iniciar sesión: Correo o contraseña incorrectos"
                 )
             }
+        }
+    }
+
+    fun cambiarNombreUsuario(nombre: String) {
+        _uiState.value = _uiState.value.copy(nombreUsuario = nombre)
+    }
+
+    fun guardarNombreYFinalizar(uid: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        Sesion.usuarioId = uid
+
+        viewModelScope.launch {
+            val nuevoUsuario = Usuario(
+                uid = uid,
+                nombre = _uiState.value.nombreUsuario,
+                email = _uiState.value.email,
+                fechaRegistro = System.currentTimeMillis()
+            )
+            repository.insertarUsuario(nuevoUsuario)
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                mostrarDialogoNombre = false,
+                registroExitoso = true
+            )
         }
     }
 }

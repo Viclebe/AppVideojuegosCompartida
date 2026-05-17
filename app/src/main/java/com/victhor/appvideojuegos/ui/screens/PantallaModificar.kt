@@ -19,13 +19,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import com.victhor.appvideojuegos.viewmodel.ModificarViewModel
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.TextButton
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,7 +110,7 @@ fun PantallaModificar(
                     )
                 }
 
-                // --- NUEVO: Estado ---
+                // Estados
                 var expanded by remember { mutableStateOf(false) }
                 val opcionesEstado = listOf("Jugando", "Pendiente", "Finalizado")
 
@@ -123,7 +124,9 @@ fun PantallaModificar(
                         readOnly = true,
                         label = { Text("Estado") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -141,7 +144,16 @@ fun PantallaModificar(
                     }
                 }
 
-                // --- NUEVO: Horas Jugadas ---
+                //caja para añadir url de la imagen
+                OutlinedTextField(
+                    value = uiState.imagenUrl,
+                    onValueChange = { viewModel.cambiarImagenUrl(it) },
+                    label = { Text("URL PORTADA")},
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    placeholder = { Text("Pega aquí el enlace de la imagen...")}
+                )
+                /*
                 OutlinedTextField(
                     value = uiState.horasJugadas,
                     onValueChange = viewModel::guardarCambiosHoras,
@@ -157,7 +169,7 @@ fun PantallaModificar(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-
+                */
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(

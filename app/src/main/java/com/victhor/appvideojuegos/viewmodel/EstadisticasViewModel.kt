@@ -1,28 +1,28 @@
 package com.victhor.appvideojuegos.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
-import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
+import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
+import com.victhor.appvideojuegos.sesion.Sesion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// --- UI STATE ---
 data class EstadisticasUiState(
     val total: Int = 0,
     val jugando: Int = 0,
     val pendientes: Int = 0,
     val finalizados: Int = 0,
+    val totalFavoritos: Int = 0,
     val mediaValoracion: Double = 0.0,
-    val horasTotales: Int = 0,
-    val isLoading: Boolean = true
+    val juegosPorPlataforma: Map<String, Int> = emptyMap(),
+    val isLoading: Boolean = false
 )
 
-// --- VIEWMODEL ---
 class EstadisticasViewModel(
-    private val repository: VideojuegoRepository,
-    private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository
+    private val firebaseRepository: VideojuegoFirebaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EstadisticasUiState())
@@ -32,44 +32,41 @@ class EstadisticasViewModel(
         cargarEstadisticas()
     }
 
-    private fun cargarEstadisticas() {
-        viewModelScope.launch {
-            // Suscribirse a todos los flujos y actualizar el uiState
-            repository.contarVideojuegos().collect { total ->
-                _uiState.value = _uiState.value.copy(total = total)
-            }
+    fun cargarEstadisticas() {
+        val uid = Sesion.usuarioId
+        if (uid.isEmpty()) {
+            _uiState.update { EstadisticasUiState(isLoading = false) }
+            return
         }
 
-        viewModelScope.launch {
-            repository.mediaValoracion().collect { media ->
-                _uiState.value = _uiState.value.copy(mediaValoracion = media ?: 0.0, isLoading = false)
-            }
-        }
-
+        _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            usuarioVideojuegoRepository.contarPorEstado("Jugando").collect { jugando ->
-                _uiState.value = _uiState.value.copy(jugando = jugando)
+            firebaseRepository.listarVideojuegos(uid).collect { lista ->
+                //Log.d("TRACestadísticas: Juegos recibidos de Firebase: ${lista.size}")
+                _uiState.update { state ->
+                    state.copy(
+                        total = lista.size,
+                        totalFavoritos = lista.count { it.favorito },
+                        jugando = lista.count { it.estado.equals("Jugando", true) },
+                        finalizados = lista.count { it.estado.equals("Finalizado", true) },
+                        pendientes = lista.count {
+                            it.estado.equals(
+                                "Pendiente",
+                                true
+                            ) || it.estado.isEmpty()
+                        },
+                        mediaValoracion = if (lista.isNotEmpty()) {
+                            String.format("%.2f", lista.map { it.valoracion }.average()).toDouble()
+                        } else {
+                            0.0
+                        },
+                        juegosPorPlataforma = lista.groupBy { it.plataforma }
+                            .mapValues { it.value.size },
+                        isLoading = false
+                    )
+                }
             }
         }
-
-        viewModelScope.launch {
-            usuarioVideojuegoRepository.contarPorEstado("Pendiente").collect { pendientes ->
-                _uiState.value = _uiState.value.copy(pendientes = pendientes)
-            }
-        }
-
-        viewModelScope.launch {
-            usuarioVideojuegoRepository.contarPorEstado("Finalizado").collect { finalizados ->
-                _uiState.value = _uiState.value.copy(finalizados = finalizados)
-            }
-        }
-
-        viewModelScope.launch {
-            usuarioVideojuegoRepository.contarHorasJugadas().collect { horas ->
-                _uiState.value = _uiState.value.copy(horasTotales = horas, isLoading = false)
-            }
-        }
-
     }
 }

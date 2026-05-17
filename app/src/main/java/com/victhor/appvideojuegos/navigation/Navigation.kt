@@ -52,11 +52,6 @@ fun Navigation( // declarar ViewModels
             PantallaSplash(navController)
         }
 
-        // ONBOARDING
-        composable(Routes.Onboarding.route) {
-            PantallaOnboarding(navController)
-        }
-
         // PRINCIPAL
         composable(Routes.Principal.route) {
             PantallaPrincipal(navController, principalViewModel)

@@ -13,9 +13,11 @@ data class Videojuego(
     val plataforma: String = "",
     val valoracion: Double = 0.0,
     val usuarioId: String = "",
+    val nombreUsuario:String="",
     val estado: String = "Pendiente",
     val favorito: Boolean = false,
     val firestoreId: String = "",
     val likes: List<String> = emptyList(), // Lista de IDs de usuarios que han dado Like
-    val fechaCreacionModificacion: Long = 0L
+    val fechaCreacionModificacion: Long = 0L,
+    val imagenUrl: String = ""
 )

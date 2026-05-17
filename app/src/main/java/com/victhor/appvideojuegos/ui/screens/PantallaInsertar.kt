@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.victhor.appvideojuegos.ui.layout.AppScaffold
 import com.victhor.appvideojuegos.viewmodel.InsertarUiState
 import com.victhor.appvideojuegos.viewmodel.InsertarViewModel
+import androidx.compose.material3.TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +88,7 @@ fun PantallaInsertar(
                     )
                 }
 
-                // --- NUEVO: Estado ---
+                // Estados
                 var expanded by remember { mutableStateOf(false) }
                 val opcionesEstado = listOf("Jugando", "Pendiente", "Finalizado")
 
@@ -101,7 +102,9 @@ fun PantallaInsertar(
                         readOnly = true,
                         label = { Text("Estado") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -119,7 +122,18 @@ fun PantallaInsertar(
                     }
                 }
 
-                // --- NUEVO: Horas Jugadas ---
+                //caja para añadir url de la imagen
+                OutlinedTextField(
+                    value = uiState.imagenUrl,
+                    onValueChange = { viewModel.cambiarImagenUrl(it) },
+                    label = { Text("URL PORTADA")},
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    placeholder = { Text("Pega aquí el enlace de la imagen...")}
+                )
+
+
+                /*
                 OutlinedTextField(
                     value = uiState.horasJugadas,
                     onValueChange = viewModel::cambiarHoras,
@@ -135,7 +149,7 @@ fun PantallaInsertar(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-
+                */
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(

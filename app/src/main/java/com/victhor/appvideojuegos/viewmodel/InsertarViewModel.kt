@@ -2,9 +2,11 @@ package com.victhor.appvideojuegos.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.victhor.appvideojuegos.data.repository.UsuarioRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
+import com.victhor.appvideojuegos.domain.model.Usuario
 import com.victhor.appvideojuegos.domain.model.UsuarioVideojuego
 import com.victhor.appvideojuegos.domain.model.Videojuego
 import com.victhor.appvideojuegos.sesion.Sesion
@@ -24,20 +26,23 @@ data class InsertarUiState(
     val isLoading: Boolean = false,
     val errorValoracion: Boolean = false,
     val errorHoras: Boolean = false,
-    val guardadoExitoso: Boolean = false
+    val guardadoExitoso: Boolean = false,
+    val nombreUsuario: String = "",
+    val imagenUrl: String = ""
 )
 
 // --- VIEWMODEL ---
 class InsertarViewModel(
     private val repository: VideojuegoRepository,
     private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
-    private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository
+    private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository,
+    private val reporitoryUsuario: UsuarioRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InsertarUiState())
     val uiState: StateFlow<InsertarUiState> = _uiState
 
-    // --- FUNCIONES DE CAMBIO ---
+    // MODIFICAR
     fun cambiarTitulo(valor: String) {
         _uiState.value = _uiState.value.copy(titulo = valor)
     }
@@ -62,23 +67,23 @@ class InsertarViewModel(
         _uiState.value = _uiState.value.copy(estado = nuevoEstado)
     }
 
-    fun cambiarHoras(valor: String) {
-        // PERMITIMOS vacío (será 0) o números positivos. No bloqueamos si está vacío.
-        val error = valor.isNotEmpty() && (valor.toIntOrNull() == null || valor.toInt() < 0)
-        _uiState.value = _uiState.value.copy(
-            horasJugadas = valor,
-            errorHoras = error
-        )
+    fun cambiarImagenUrl(valor: String) {
+        _uiState.value = _uiState.value.copy(imagenUrl = valor)
     }
 
-    // --- GUARDAR NUEVO VIDEOJUEGO ---
+    // Guardar los juegos nuevos
     fun guardar() {
         val state = _uiState.value
-
-        if (state.errorValoracion || state.errorHoras) return
+        if (state.errorValoracion) return
 
         viewModelScope.launch {
-            // Creamos el objeto completo para Firebase
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            // Buscar el nombre real del repositorio usando firebase
+            val emailActual = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email ?: ""
+            val usuarioActual = reporitoryUsuario.obtenerUsuarioPorEmail(emailActual)
+
+            val nombreARegistrar = usuarioActual?.nombre ?: emailActual.substringBefore("@")
+            // Crear objeto
             val nuevoJuego = Videojuego(
                 id = 0,
                 titulo = state.titulo,
@@ -86,19 +91,20 @@ class InsertarViewModel(
                 plataforma = state.plataforma,
                 valoracion = state.valoracion.toDoubleOrNull() ?: 0.0,
                 usuarioId = Sesion.usuarioId,
+                nombreUsuario = nombreARegistrar,
                 estado = state.estado,
                 favorito = false,
                 firestoreId = "",
                 likes = emptyList(),
-                fechaCreacionModificacion = System.currentTimeMillis()
+                fechaCreacionModificacion = System.currentTimeMillis(),
+                imagenUrl = state.imagenUrl,
             )
 
-            // Guardamos directamente en Firebase
             try {
                 videojuegoFirebaseRepository.insertarVideojuego(nuevoJuego)
                 _uiState.value = state.copy(guardadoExitoso = true)
             } catch (e: Exception) {
-                // Si hubiera un error de red, aquí podrías manejarlo
+                e.toString()
             }
         }
     }
