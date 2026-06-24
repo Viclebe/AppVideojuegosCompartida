@@ -4,28 +4,24 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.victhor.appvideojuegos.data.local.database.VideojuegoDatabase
-import com.victhor.appvideojuegos.data.repository.ComentarioRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioRepository
 import com.victhor.appvideojuegos.data.repository.ValoracionRepository
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
 
 class AppViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        // Obtenemos la instancia de la base de datos y los DAO
+        // Obtener instancias de repositorios y DAOs
         val db = VideojuegoDatabase.obtenerInstancia(application)
-        val videojuegoDao = db.videojuegoDao()
         val usuarioDao = db.usuarioDao()
         val valoracionDao = db.valoracionDao()
         val usuarioVideojuegoDao = db.usuarioVideojuegoDao()
 
-        val repository = VideojuegoRepository(videojuegoDao, usuarioVideojuegoDao)
         val usuarioRepository = UsuarioRepository(usuarioDao)
         val valoracionRepository = ValoracionRepository(valoracionDao)
         val usuarioVideojuegoRepository = UsuarioVideojuegoRepository(usuarioVideojuegoDao)
 
-        // --- REPOSITORIOS FIREBASE ---
+        // Repositorio de Firbase
         val firebaseVideojuegoRepository = VideojuegoFirebaseRepository()
 
         return when {
@@ -47,8 +43,6 @@ class AppViewModelFactory(private val application: Application) : ViewModelProvi
 
             modelClass.isAssignableFrom(InsertarViewModel::class.java) -> {
                 InsertarViewModel(
-                    repository,
-                    usuarioVideojuegoRepository,
                     firebaseVideojuegoRepository,
                     usuarioRepository
                 ) as T

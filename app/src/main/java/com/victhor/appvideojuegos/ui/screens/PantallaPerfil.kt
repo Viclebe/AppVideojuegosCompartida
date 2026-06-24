@@ -70,19 +70,8 @@ fun PantallaPerfil(
 
             if (uiState.isLoading) {
                 CircularProgressIndicator(color = AcentoNeonCyan)
-            } /*else if (!uiState.perfilReconocido) {
-
-                //vOLVER A LOGIN SI USUARIO NO ENCONTRADO
-                Text("USUARIO NO ENCONTRADO", color = Color.Red)
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { navController.navigate(Routes.Login.route) { popUpTo(0) } },
-                    colors = ButtonDefaults.buttonColors(containerColor = AcentoNeonCyan)
-                ) {
-                    Text("VOLVER A INICIAR SESIÓN", color = Color.Black)
-                }
-            } */ else {
-                // CARD MOSTRAR INFO DEL USUARIO
+            } else {
+                // Card con la info del usuario
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = FondoContenedoresOscuro,
@@ -93,7 +82,7 @@ fun PantallaPerfil(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Avatar Neon
+                        // Avatar
                         Box(
                             modifier = Modifier
                                 .size(80.dp)

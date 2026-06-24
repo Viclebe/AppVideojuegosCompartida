@@ -2,9 +2,7 @@ package com.victhor.appvideojuegos.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
-import com.victhor.appvideojuegos.data.repository.ComentarioRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioRepository
 import com.victhor.appvideojuegos.data.repository.ValoracionRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
@@ -54,7 +52,6 @@ class DetalleViewModel(
                             )
                         }
                     } catch (e: Exception) {
-                        // Ignorar fallo puntual
                         e.toString()
                         _uiState.value = _uiState.value.copy(isLoading = false, error = "Error red")
                     }

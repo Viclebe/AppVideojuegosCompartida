@@ -2,7 +2,6 @@ package com.victhor.appvideojuegos.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
 import com.victhor.appvideojuegos.domain.model.UsuarioVideojuego

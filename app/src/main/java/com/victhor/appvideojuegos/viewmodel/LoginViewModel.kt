@@ -158,4 +158,8 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
             )
         }
     }
+    fun limpiarEstado() {
+        _uiState.value = LoginUiState()
+    }
+
 }

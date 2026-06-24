@@ -49,6 +49,7 @@ fun PantallaLogin(
             navController.navigate(Routes.Principal.route) {
                 popUpTo(Routes.Login.route) { inclusive = true } // Evitar volver pantalla atrás
             }
+            viewModel.limpiarEstado()
         }
     }
 
@@ -168,11 +169,11 @@ fun PantallaLogin(
         }
     }
 
-    // --- DIÁLOGO DE NOMBRE (Pégalo al final de la función PantallaLogin) ---
+    // Ventana emergente nombre
     if (state.mostrarDialogoNombre) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("IDENTIDAD_REQUERIDA", color = AcentoNeonBlue, fontWeight = FontWeight.Bold) },
+            title = { Text("Identidad", color = AcentoNeonBlue, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
                     Text("Configura tu nombre de usuario para el sistema:", color = Color.White)
@@ -189,7 +190,7 @@ fun PantallaLogin(
             confirmButton = {
                 Button(
                     onClick = {
-                        // Accedemos a Firebase para pillar el UID y terminar el proceso
+                        // Acceder a firebase y terminar proceso creación
                         val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
                         viewModel.guardarNombreYFinalizar(uid)
                     },

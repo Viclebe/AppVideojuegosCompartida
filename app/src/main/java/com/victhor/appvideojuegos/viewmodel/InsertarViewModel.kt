@@ -3,7 +3,6 @@ package com.victhor.appvideojuegos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victhor.appvideojuegos.data.repository.UsuarioRepository
-import com.victhor.appvideojuegos.data.repository.VideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.UsuarioVideojuegoRepository
 import com.victhor.appvideojuegos.data.repository.VideojuegoFirebaseRepository
 import com.victhor.appvideojuegos.domain.model.Usuario
@@ -33,8 +32,6 @@ data class InsertarUiState(
 
 // --- VIEWMODEL ---
 class InsertarViewModel(
-    private val repository: VideojuegoRepository,
-    private val usuarioVideojuegoRepository: UsuarioVideojuegoRepository,
     private val videojuegoFirebaseRepository: VideojuegoFirebaseRepository,
     private val reporitoryUsuario: UsuarioRepository
 ) : ViewModel() {

@@ -120,7 +120,7 @@ class VideojuegoFirebaseRepository {
      * PARA COMUNIDADVIEWMODEL
      */
     fun listarTotalComunidad(): Flow<List<Videojuego>> = callbackFlow {
-        // Apuntar a colleccion y ordenar por fecha
+        // Apuntar a coleción ordenar por fecha
         val query = coleccion.orderBy(
             "fechaCreacionModificacion",
             com.google.firebase.firestore.Query.Direction.DESCENDING
@@ -133,35 +133,31 @@ class VideojuegoFirebaseRepository {
                 return@addSnapshotListener
             }
 
-            // Convertir documentos de la coleccion en Videojuegos
+            // Convertir documentos en Videojuegos
             val videojuegos = snapshot?.documents?.mapNotNull { documentos ->
                 documentos.toObject(Videojuego::class.java)?.copy(firestoreId = documentos.id)
             } ?: emptyList()
             trySend(videojuegos)
         }
-        awaitClose { listener.remove() } // Finaliza la escucha
+        awaitClose { listener.remove() } // Finalizar escucha
     }
 
     /**
      * Guardar un comentario en Firebase.
-     * Cualquier usuario puede comentar en cualquier videojuego.
-     */
+    */
     suspend fun guardarComentario(comentario: Comentario) {
         val nuevoDoc = firestore.collection("comentarios").document()
         nuevoDoc.set(comentario.copy(firestoreId = nuevoDoc.id)).await()
     }
 
     /**
-     * Obtener los comentarios de un videojuego en tiempo real.
-     * Se ordenan del más reciente al más antiguo.
+     * Obtener comentarios de un videojuego.
      */
     fun obtenerComentarios(firestoreIdVideojuego: String): Flow<List<Comentario>> = callbackFlow {
         val listener = firestore.collection("comentarios")
             .whereEqualTo("firestoreIdVideojuego", firestoreIdVideojuego)
-            // .orderBy("fechaComentario", Query.Direction.DESCENDING) // Quitamos orderBy para evitar crash de index
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    // Si hay error (ej. permisos), no crasheamos la app
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
@@ -169,7 +165,7 @@ class VideojuegoFirebaseRepository {
                     doc.toObject(Comentario::class.java)?.copy(firestoreId = doc.id)
                 } ?: emptyList()
                 
-                // Ordenamos la lista localmente de más reciente a más antiguo
+                // Ordenar la lista
                 val listaOrdenada = lista.sortedByDescending { it.fechaComentario }
                 trySend(listaOrdenada)
             }

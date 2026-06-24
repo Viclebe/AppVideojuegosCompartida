@@ -53,5 +53,5 @@ class PerfilViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
     fun cerrarSesion() {
         Sesion.usuarioId = ""
-    }
+        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()    }
 }

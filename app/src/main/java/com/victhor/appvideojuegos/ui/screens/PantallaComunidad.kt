@@ -130,7 +130,7 @@ fun PantallaComunidad(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Listado de juevos
+            // Listado de juegos
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = AcentoNeonMagenta)

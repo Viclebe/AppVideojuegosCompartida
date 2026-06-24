@@ -75,7 +75,8 @@ interface VideojuegoDAO {
      * @param texto con el que realizará la búsqueda.
      * @return List de videojuegos que coincidan.
      */
-    @Query("SELECT * FROM videojuegos WHERE usuarioId = :usuarioId AND (titulo LIKE '%' || :texto || '%' OR genero LIKE '%' || :texto || '%' OR plataforma LIKE '%' || :texto || '%') ")
+    @Query("SELECT * FROM videojuegos WHERE usuarioId = :usuarioId AND (titulo LIKE '%' || :texto || '%' OR genero " +
+            "LIKE '%' || :texto || '%' OR plataforma LIKE '%' || :texto || '%') ")
     fun buscarVideojuegos(usuarioId: String, texto: String): Flow<List<VideojuegoEntity>>
 
     /**
